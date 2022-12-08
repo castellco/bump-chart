@@ -1,0 +1,149 @@
+---
+title: "Simple example"
+output:
+  pdf_document: default
+params:
+  args: myarg
+---
+
+# Import libraries
+```{r}
+library(ggplot2)
+# library(ggbump)
+library(tidyverse)
+```
+
+# Import data
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/carolinacornejocastellano/bump-chart/main/data.csv")
+```
+
+# Pivot longer, add ranks and order chronologically
+```{r}
+df <- df %>%
+  pivot_longer(-generation, names_to = "variables", values_to = "dollars") %>%
+  group_by(generation) %>%
+  arrange(generation, desc(dollars)) %>%
+  mutate(ranking = row_number())
+
+df$generation[df$generation == "silent"] <- "Silent"
+df$generation[df$generation == "boomers"] <- "Boomers"
+df$generation[df$generation == "gen_X"] <- "Generation X"
+df$generation[df$generation == "millennials"] <- "Millennials"
+df$generation[df$generation == "gen_Z"] <- "Generation Z"
+
+df$variables[df$variables == "alcohol"] <- "Alcoholic beverages"
+df$variables[df$variables == "apparel"] <- "Apparel and services"
+df$variables[df$variables == "cash_contributions"] <- "Cash contributions"
+df$variables[df$variables == "education"] <- "Education"
+df$variables[df$variables == "entertainment"] <- "Entertainment"
+df$variables[df$variables == "food"] <- "Food"
+df$variables[df$variables == "entertainment"] <- "Entertainment"
+df$variables[df$variables == "healthcare"] <- "Healthcare"
+df$variables[df$variables == "housing"] <- "Housing"
+df$variables[df$variables == "insurance"] <- "Personal insurance and pensions"
+df$variables[df$variables == "miscellaneous"] <- "Miscellaneous expenditures"
+df$variables[df$variables == "personal_care"] <- "Personal care products and services"
+df$variables[df$variables == "reading"] <- "Reading"
+df$variables[df$variables == "smoking"] <- "Tobacco products and smoking supplies"
+df$variables[df$variables == "transportation"] <- "Transportation"
+
+x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Generation Z")
+```
+
+
+# Build custom theme
+
+```{r}
+theme_bump <- function() {
+  # Colors
+  color_background <- "#e5d9cf"
+  color_text <- "black"
+
+  # Begin construction of chart
+  theme_bw(base_size = 15) +
+
+    # Format background colors
+    theme(panel.background = element_rect(fill = color_background, color = color_background)) +
+    theme(plot.background = element_rect(fill = color_background, color = color_background)) +
+    theme(panel.border = element_rect(color = color_background)) +
+    theme(strip.background = element_rect(fill = color_background, color = color_background)) +
+
+    # Format the grid
+    theme(panel.grid.major.y = element_blank()) +
+    theme(panel.grid.minor.y = element_blank()) +
+    theme(axis.ticks = element_blank()) +
+
+    # Format the legend
+    theme(legend.position = "none") +
+
+    # Format title and axis labels
+    theme(plot.title = element_text(color = color_text, size = 20, face = "bold", hjust = 0.5, )) +
+    theme(plot.subtitle = element_text(color = color_text, size = 15, hjust = 0.5, )) +
+    theme(axis.title.x = element_blank()) +
+    theme(axis.title.y = element_blank()) +
+    theme(axis.text.x = element_text(size = 13, vjust = 0.5, hjust = 0.5, color = color_text, face = "bold")) +
+    theme(axis.text.y =  element_text(size = 10, color = color_text)) +
+    theme(strip.text = element_text(face = "bold")) +
+
+    # Plot margins
+    theme(plot.margin = unit(c(0.35, 0.2, 0.3, 0.35), "cm"))
+}
+```
+
+# Bump chart
+
+```{#r}
+ggplot(
+  data = df,
+  aes(x = generation, y = ranking, group = variables)
+) +
+  geom_line(aes(color = variables, alpha = 1), linewidth = 6) +
+  geom_point(aes(color = variables, alpha = 1), size = 10) +
+  scale_y_reverse(breaks = 1:nrow(df)) +
+  scale_x_discrete(limits = x_names_ordered, position = "top") +
+  labs(
+    title = "HOW AMERICANS SPEND THEIR MONEY",
+    subtitle = "By Age Group | 2021",
+    caption = "Original author: Preethi Lodha"
+  ) +
+  theme_bump() +
+  geom_text(data =df,aes(label=dollars),hjust="center") + #FIXME
+  scale_color_manual(values = c(
+    "#9c6255",
+    "#a0d4ee",
+    "#9d8379",
+    "#8e92b5",
+    "#484d4d",
+    "#ed454b",
+    "#8a8986",
+    "#a03b5c",
+    "#86a7a1",
+    "#af9e2e",
+    "#6c1f28",
+    "#476f9c",
+    "#3897c5",
+    "black" #FIXME
+  ))
+```
+
+```{r}
+ggplot(data = df, aes(x = generation, y = ranking, group = variables)) +
+  geom_line(aes(color = variables, alpha = 1), size = 2) +
+  geom_point(aes(color = variables, alpha = 1), size = 4) +
+  scale_x_discrete(expand = c(0.85,0))+
+  scale_y_reverse(breaks = 1:nrow(df))+
+  theme(legend.position = "none") +
+  labs(x = "year",
+       y = "rank",
+       title = "American Kennel") +
+  theme_bump() 
+  # + geom_text(data =df,aes(y=variables,x=color_background,label=variables),hjust="right")
+
+```
+
+
+
+```{r}
+#ggsave("bump.png", path = "~/Desktop", width = 10, height = 10, dpi = 300)
+```
