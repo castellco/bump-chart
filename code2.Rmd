@@ -15,7 +15,8 @@ library(purrr)
 
 # DF
 ```{r}
-data <- read_csv("data2.csv")
+data <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data2.csv")
+#View(data)
 ```
 
 # reorder years

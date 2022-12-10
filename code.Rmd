@@ -15,7 +15,9 @@ library(tidyverse)
 
 # Import data
 ```{r}
-df <- read_csv("https://raw.githubusercontent.com/carolinacornejocastellano/bump-chart/main/data.csv")
+
+df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data.csv")
+#View(df)
 ```
 
 # Pivot longer, add ranks and order chronologically
@@ -93,7 +95,7 @@ theme_bump <- function() {
 
 # Bump chart
 
-```{#r}
+```{r}
 ggplot(
   data = df,
   aes(x = generation, y = ranking, group = variables)
@@ -108,7 +110,10 @@ ggplot(
     caption = "Original author: Preethi Lodha"
   ) +
   theme_bump() +
-  geom_text(data =df,aes(label=dollars),hjust="center") + #FIXME
+  geom_text(data = df %>% filter(generation == "Generation Z"),
+            aes(label = variables, x = 1.5) , hjust = 0, fontface = "bold", color = "black", size = 4) +
+
+  #geom_text(data =df, aes(label=dollars),hjust="center") + #FIXME
   scale_color_manual(values = c(
     "#9c6255",
     "#a0d4ee",
@@ -128,6 +133,14 @@ ggplot(
 ```
 
 ```{r}
+geom_text(data = df.rankings %>% filter(day == "1"),
+            aes(label = country, x = 0.5) , hjust = .85, fontface = "bold", color = "#888888", size = 4) +
+  geom_text(data = df.rankings %>% filter(day == "16"),
+            aes(label = country, x = 16.5) , hjust = 0.15, fontface = "bold", color = "#888888", size = 4) +
+```
+
+
+```{#r}
 ggplot(data = df, aes(x = generation, y = ranking, group = variables)) +
   geom_line(aes(color = variables, alpha = 1), size = 2) +
   geom_point(aes(color = variables, alpha = 1), size = 4) +
@@ -145,5 +158,5 @@ ggplot(data = df, aes(x = generation, y = ranking, group = variables)) +
 
 
 ```{r}
-#ggsave("bump.png", path = "~/Desktop", width = 10, height = 10, dpi = 300)
+ggsave("bump.png", path = "~/bump-chart", width = 10, height = 10, dpi = 300)
 ```
