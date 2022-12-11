@@ -110,10 +110,8 @@ ggplot(
     caption = "Original author: Preethi Lodha"
   ) +
   theme_bump() +
-  geom_text(data = df %>% filter(generation == "Generation Z"),
-            aes(label = variables, x = 1.5) , hjust = 0, fontface = "bold", color = "black", size = 4) +
-
-  #geom_text(data =df, aes(label=dollars),hjust="center") + #FIXME
+    geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.9), hjust = "right", fontface = "bold", color = "black", size = 5) +
+   geom_text(data = df, aes(label = dollars), hjust = "center") + # FIXME
   scale_color_manual(values = c(
     "#9c6255",
     "#a0d4ee",
@@ -132,31 +130,6 @@ ggplot(
   ))
 ```
 
-```{r}
-geom_text(data = df.rankings %>% filter(day == "1"),
-            aes(label = country, x = 0.5) , hjust = .85, fontface = "bold", color = "#888888", size = 4) +
-  geom_text(data = df.rankings %>% filter(day == "16"),
-            aes(label = country, x = 16.5) , hjust = 0.15, fontface = "bold", color = "#888888", size = 4) +
-```
-
-
 ```{#r}
-ggplot(data = df, aes(x = generation, y = ranking, group = variables)) +
-  geom_line(aes(color = variables, alpha = 1), size = 2) +
-  geom_point(aes(color = variables, alpha = 1), size = 4) +
-  scale_x_discrete(expand = c(0.85,0))+
-  scale_y_reverse(breaks = 1:nrow(df))+
-  theme(legend.position = "none") +
-  labs(x = "year",
-       y = "rank",
-       title = "American Kennel") +
-  theme_bump() 
-  # + geom_text(data =df,aes(y=variables,x=color_background,label=variables),hjust="right")
-
-```
-
-
-
-```{r}
 ggsave("bump.png", path = "~/bump-chart", width = 10, height = 10, dpi = 300)
 ```

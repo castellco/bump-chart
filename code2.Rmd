@@ -78,13 +78,13 @@ ggplot(data = datalong, aes(x = generation, y = Rank, group = variables)) +
   labs(x = "generation",
        y = "Rank",
        title = "American Kennel Club \nmost popular breeds") +
-  theme_bump() + 
+  theme_bump()  
   #geom_image(data=data,aes(y=1:10,x=6,image=drawing))+
-  geom_text(data =data,aes(y=Silent,x=0.6,label=variables),hjust="right")
+  # + geom_text(data =data,aes(y=Silent,x=0.6,label=variables),hjust="right")
 ```
 
 #mio
-```{r}
+```{#r}
 ggplot(data = datalong, aes(x = generation, y = Rank, group = variables)
 ) +
   geom_line(aes(color = variables, alpha = 1), linewidth = 6) +
