@@ -1,15 +1,11 @@
 ---
-title: "Simple example"
-output:
-  pdf_document: default
-params:
-  args: myarg
+title: "Bump chart replica"
 ---
 
 # Import libraries
 ```{r}
 library(ggplot2)
-# library(ggbump)
+library(here)
 library(tidyverse)
 ```
 
@@ -85,11 +81,11 @@ theme_bump <- function() {
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
     theme(axis.text.x = element_text(size = 13, vjust = 0.5, hjust = 0.5, color = color_text, face = "bold")) +
-    theme(axis.text.y =  element_text(size = 10, color = color_text)) +
+    theme(axis.text.y =  element_blank()) +
     theme(strip.text = element_text(face = "bold")) +
 
     # Plot margins
-    theme(plot.margin = unit(c(0.35, 0.2, 0.3, 0.35), "cm"))
+    theme(plot.margin = unit(c(1, 0,2, 2, 0.1), "cm")) # First one is upper margin, second one is right margin, third is left margin
 }
 ```
 
@@ -98,10 +94,9 @@ theme_bump <- function() {
 ```{r}
 ggplot(
   data = df,
-  aes(x = generation, y = ranking, group = variables)
-) +
-  geom_line(aes(color = variables, alpha = 1), linewidth = 6) +
-  geom_point(aes(color = variables, alpha = 1), size = 10) +
+  aes(x = generation, y = ranking, group = variables)) +
+  geom_line(aes(color = variables, alpha = 1), linewidth = 7) +
+  geom_point(aes(color = variables), size = 23) +
   scale_y_reverse(breaks = 1:nrow(df)) +
   scale_x_discrete(limits = x_names_ordered, position = "top") +
   labs(
@@ -111,7 +106,7 @@ ggplot(
   ) +
   theme_bump() +
     geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.9), hjust = "right", fontface = "bold", color = "black", size = 5) +
-   geom_text(data = df, aes(label = dollars), hjust = "center") + # FIXME
+   geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
   scale_color_manual(values = c(
     "#9c6255",
     "#a0d4ee",
@@ -131,5 +126,5 @@ ggplot(
 ```
 
 ```{#r}
-ggsave("bump.png", path = "~/bump-chart", width = 10, height = 10, dpi = 300)
+ggsave("bump-replica.png", path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 10, height = 10, dpi = 300)
 ```
