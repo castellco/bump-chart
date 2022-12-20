@@ -5,15 +5,13 @@ title: "Bump chart replica"
 # Import libraries
 ```{r}
 library(ggplot2)
-library(here)
 library(tidyverse)
 ```
 
 # Import data
 ```{r}
-
 df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data.csv")
-#View(df)
+# View(df)
 ```
 
 # Pivot longer, add ranks and order chronologically
@@ -74,6 +72,9 @@ theme_bump <- function() {
 
     # Format the legend
     theme(legend.position = "none") +
+    
+    # Format de caption
+    theme(plot.caption = element_text(hjust = 0.5, size = 9.5)) + 
 
     # Format title and axis labels
     theme(plot.title = element_text(color = color_text, size = 20, face = "bold", hjust = 0.5, )) +
@@ -85,28 +86,32 @@ theme_bump <- function() {
     theme(strip.text = element_text(face = "bold")) +
 
     # Plot margins
-    theme(plot.margin = unit(c(1, 0,2, 2, 0.1), "cm")) # First one is upper margin, second one is right margin, third is left margin
+    theme(plot.margin = unit(c(1, 0.2, 2, 0), "cm")) # top, right, bottom, left
 }
 ```
 
-# Bump chart
+```{#r}
+scale_x_discrete(limits = x_names_ordered, position = "top", expand=c(0.52, 0.9)) +
+```
+# Bump chart 
 
 ```{r}
 ggplot(
   data = df,
   aes(x = generation, y = ranking, group = variables)) +
   geom_line(aes(color = variables, alpha = 1), linewidth = 7) +
-  geom_point(aes(color = variables), size = 23) +
+  geom_point(size = 21, color="white") +
+  geom_point(aes(color = variables), size = 20) +
   scale_y_reverse(breaks = 1:nrow(df)) +
-  scale_x_discrete(limits = x_names_ordered, position = "top") +
+  scale_x_discrete(limits = x_names_ordered, position = "top", expand = expansion(mult = c(0.35, 0.1))) +
   labs(
     title = "HOW AMERICANS SPEND THEIR MONEY",
     subtitle = "By Age Group | 2021",
     caption = "Original author: Preethi Lodha"
   ) +
   theme_bump() +
-    geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.9), hjust = "right", fontface = "bold", color = "black", size = 5) +
-   geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
+    geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72), hjust = "outward", fontface = "bold", color = "black", size = 5) +
+    geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
   scale_color_manual(values = c(
     "#9c6255",
     "#a0d4ee",
