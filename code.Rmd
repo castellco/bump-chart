@@ -7,6 +7,7 @@ title: "Bump chart replica"
 library(tidyverse)
 library(ggplot2)
 library(ggtext)
+library(glue)
 ```
 
 element markdown ggtext 
@@ -48,19 +49,25 @@ df$variables[df$variables == "personal_care"] <- "Personal care products and ser
 df$variables[df$variables == "reading"] <- "Reading"
 df$variables[df$variables == "smoking"] <- "Tobacco products and smoking \n supplies"
 df$variables[df$variables == "transportation"] <- "Transportation"
+```
 
+```{r}
 x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Generation Z")
 x_names_full <- c(
-  "Silent \n 1945 or earlier \n $44,683", 
+  "*Silent* \n 1945 or earlier \n $44,683",
   "Boomers \n 1946 to 1964 \n $62,203", 
   "Generation X \n 1965 to 1980 \n $83,357", 
   "Millennials \n 1981 to 1996 \n $69,061", 
   "Generation Z \n 1997 or later \n $41,636"
 )
 
-#name = glue("<i style='color:{color}'>{bactname}</i> ({OTUname})"),
-```
+#glue("<i style='color:{color}'>{bactname}</i> ({OTUname})")
 
+#  "**Silent** \n 1945 or earlier \n $44,683", 
+
+#mtext(bquote(bold(.(x_names_ordered[1]))~ "1945 or earlier?"),2,3)
+  #name = glue("<i style='color:{color}'>{bactname}</i> ({OTUname})"),
+```
 
 # Build custom theme
 
@@ -110,10 +117,13 @@ ggplot(
   data = df,
   aes(x = generation, y = ranking, group = variables)) +
   geom_line(aes(color = variables, alpha = 1, linewidth = rev(ranking))) +
-  geom_point(size = 21, color="white") +
-  geom_point(aes(color = variables), size = 20) +
+    geom_point(size = 21, color = "white") +
+    geom_point(aes(color = variables), size = 20) +
   scale_y_reverse(breaks = 1:nrow(df)) +
-  scale_x_discrete(limits = x_names_ordered, , labels = x_names_full, position = "top", expand = expansion(mult = c(0.35, 0.1))) +
+  scale_x_discrete(limits = x_names_ordered, 
+                  label = x_names_full, 
+                  position = "top", 
+                  expand = expansion(mult = c(0.35, 0.1))) +
   labs(
     title = "HOW AMERICANS SPEND THEIR MONEY",
     subtitle = "By Age Group | 2021",
