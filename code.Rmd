@@ -6,8 +6,9 @@ title: "Bump chart replica"
 ```{r}
 library(tidyverse)
 library(ggplot2)
-library(ggtext)
+library(stringi)
 library(glue)
+library(ggtext)
 ```
 
 element markdown ggtext 
@@ -53,21 +54,17 @@ df$variables[df$variables == "transportation"] <- "Transportation"
 
 ```{r}
 x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Generation Z")
-x_names_full <- c(
-  "*Silent* \n 1945 or earlier \n $44,683",
-  "Boomers \n 1946 to 1964 \n $62,203", 
-  "Generation X \n 1965 to 1980 \n $83,357", 
-  "Millennials \n 1981 to 1996 \n $69,061", 
-  "Generation Z \n 1997 or later \n $41,636"
-)
-
-#glue("<i style='color:{color}'>{bactname}</i> ({OTUname})")
-
-#  "**Silent** \n 1945 or earlier \n $44,683", 
-
-#mtext(bquote(bold(.(x_names_ordered[1]))~ "1945 or earlier?"),2,3)
-  #name = glue("<i style='color:{color}'>{bactname}</i> ({OTUname})"),
 ```
+
+```{r}
+labels = c("**Silent** <p> 1945 or earlier <p> **$44,683**", 
+            "**Boomers** <p> 1946 to 1964 <p> **$62,203**",
+            "**Generation X** <p> 1965 to 1980 <p> **$83,357**", 
+            "**Millennials** <p> 1981 to 1996 <p> **$69,061**", 
+            "**Generation Z** <p> 1997 or later <p> **$41,636**"
+)
+```
+
 
 # Build custom theme
 
@@ -92,16 +89,17 @@ theme_bump <- function() {
 
     # Format the legend
     theme(legend.position = "none") +
-    
+
     # Format de caption
-    theme(plot.caption = element_text(hjust = 0.5, size = 9.5)) + 
+    theme(plot.caption = element_text(hjust = 0.5, size = 9.5)) +
 
     # Format title and axis labels
     theme(plot.title = element_text(color = color_text, size = 20, face = "bold", hjust = 0.5, )) +
     theme(plot.subtitle = element_text(color = color_text, size = 15, hjust = 0.5, )) +
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
-    theme(axis.text.x = element_markdown(size = 13, vjust = 0.5, hjust = 0.5, color = color_text)) +
+    theme(axis.text.x.top = element_markdown()) +
+    theme(axis.text.x =  element_text()) +
     theme(axis.text.y =  element_blank()) +
     theme(strip.text = element_text(face = "bold")) +
 
@@ -113,41 +111,43 @@ theme_bump <- function() {
 # Bump chart 
 
 ```{r}
-ggplot(
+a <- ggplot(
   data = df,
   aes(x = generation, y = ranking, group = variables)) +
+   theme_bump() +
   geom_line(aes(color = variables, alpha = 1, linewidth = rev(ranking))) +
     geom_point(size = 21, color = "white") +
     geom_point(aes(color = variables), size = 20) +
   scale_y_reverse(breaks = 1:nrow(df)) +
-  scale_x_discrete(limits = x_names_ordered, 
-                  label = x_names_full, 
-                  position = "top", 
+  scale_x_discrete(limits = x_names_ordered,
+                  labels = labels,
+                  position = "top",
                   expand = expansion(mult = c(0.35, 0.1))) +
   labs(
     title = "HOW AMERICANS SPEND THEIR MONEY",
     subtitle = "By Age Group | 2021",
     caption = "Original author: Preethi Lodha"
   ) +
-  theme_bump() +
     geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72), hjust = "outward", fontface = "bold", color = "black", size = 5) +
-    geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
-  scale_color_manual(values = c(
-    "#9c6255",
-    "#a0d4ee",
-    "#9d8379",
-    "#8e92b5",
-    "#484d4d",
-    "#ed454b",
-    "#8a8986",
-    "#a03b5c",
-    "#86a7a1",
-    "#af9e2e",
-    "#6c1f28",
-    "#476f9c",
-    "#3897c5",
-    "black" #FIXME
-  ))
+      geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
+      scale_color_manual(values = c(
+        "#9c6255",
+        "#a0d4ee",
+        "#9d8379",
+        "#8e92b5",
+        "#484d4d",
+        "#ed454b",
+        "#8a8986",
+        "#a03b5c",
+        "#86a7a1",
+        "#af9e2e",
+        "#6c1f28",
+        "#476f9c",
+        "#3897c5",
+        "black" # FIXME
+      ))
+
+a
 ```
 
 ```{#r}
