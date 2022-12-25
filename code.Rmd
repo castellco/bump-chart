@@ -6,8 +6,6 @@ title: "Bump chart replica"
 ```{r}
 library(tidyverse)
 library(ggplot2)
-library(stringi)
-library(glue)
 library(ggtext)
 library(httpgd)
 ```
@@ -15,7 +13,6 @@ library(httpgd)
 ```{#r}
 hgd()
 ```
-element markdown ggtext 
 PARALLEL 
 ver la evolución por generación, ya no por variable
 
@@ -70,6 +67,10 @@ x_names_full = c(
 )
 ```
 
+```{r}
+x_lab <- c("**Generation**<br>Birth Year Range<br>**Average Annual Expenditure**")
+```
+
 # Build custom theme
 
 ```{r}
@@ -102,10 +103,13 @@ theme_bump <- function() {
     theme(plot.subtitle = element_text(color = color_text, size = 15, hjust = 0.5)) +
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
+    theme(axis.text = element_markdown()) +
+    theme(axis.text.x = element_markdown()) +
     theme(axis.text.x.top = element_markdown()) +
-    theme(axis.text.x =  element_blank()) +
-    theme(axis.text.y =  element_blank()) +
-    #theme(strip.text = element_text(face = "bold")) +
+    theme(axis.text.y = element_blank()) +
+    # theme(strip.text = element_text(face = "bold")) +
+    theme(plot.tag = element_markdown()) +
+    theme(plot.tag.position = c(0.15, 0.91)) +
 
     # Plot margins
     theme(plot.margin = unit(c(1, 0.2, 2, 0), "cm")) # top, right, bottom, left
@@ -123,14 +127,15 @@ a <- ggplot(
      geom_point(size = 21, color = "white") +
      geom_point(aes(color = variables), size = 20) +
      scale_y_reverse(breaks = 1:nrow(df)) +
-    scale_x_discrete(limits = x_names_ordered,
+     scale_x_discrete(limits = x_names_ordered,
                   labels = x_names_full,
                   position = "top",
                   expand = expansion(mult = c(0.35, 0.1))) +
   labs(
     title = "HOW AMERICANS SPEND THEIR MONEY",
     subtitle = "By Age Group | 2021",
-    caption = "Original author: Preethi Lodha"
+    caption = "Original author: Preethi Lodha",
+    tag = x_lab
   ) +
     geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72), hjust = "outward", fontface = "bold", color = "black", size = 5) +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 4.8) + # FIXME
@@ -149,8 +154,7 @@ a <- ggplot(
         "#476f9c",
         "#3897c5",
         "black" # FIXME
-      ))
-
+      )) 
 a
 ```
 
