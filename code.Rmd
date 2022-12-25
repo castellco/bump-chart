@@ -9,8 +9,12 @@ library(ggplot2)
 library(stringi)
 library(glue)
 library(ggtext)
+library(httpgd)
 ```
 
+```{#r}
+hgd()
+```
 element markdown ggtext 
 PARALLEL 
 ver la evolución por generación, ya no por variable
@@ -57,14 +61,14 @@ x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Genera
 ```
 
 ```{r}
-labels = c("**Silent** <p> 1945 or earlier <p> **$44,683**", 
-            "**Boomers** <p> 1946 to 1964 <p> **$62,203**",
-            "**Generation X** <p> 1965 to 1980 <p> **$83,357**", 
-            "**Millennials** <p> 1981 to 1996 <p> **$69,061**", 
-            "**Generation Z** <p> 1997 or later <p> **$41,636**"
+x_names_full = c(
+  "**Silent**<br>1945 or earlier<br>**$44,683**",
+  "**Boomers**<br>1946 to 1964<br>**$62,203**",
+  "**Generation X**<br>1965 to 1980<br>**$83,357**",
+  "**Millennials**<br>1981 to 1996<br>**$69,061**",
+  "**Generation Z**<br>1997 or later<br>**$41,636**"
 )
 ```
-
 
 # Build custom theme
 
@@ -94,14 +98,14 @@ theme_bump <- function() {
     theme(plot.caption = element_text(hjust = 0.5, size = 9.5)) +
 
     # Format title and axis labels
-    theme(plot.title = element_text(color = color_text, size = 20, face = "bold", hjust = 0.5, )) +
-    theme(plot.subtitle = element_text(color = color_text, size = 15, hjust = 0.5, )) +
+    theme(plot.title = element_text(color = color_text, size = 20, face = "bold", hjust = 0.5)) +
+    theme(plot.subtitle = element_text(color = color_text, size = 15, hjust = 0.5)) +
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
     theme(axis.text.x.top = element_markdown()) +
-    theme(axis.text.x =  element_text()) +
+    theme(axis.text.x =  element_blank()) +
     theme(axis.text.y =  element_blank()) +
-    theme(strip.text = element_text(face = "bold")) +
+    #theme(strip.text = element_text(face = "bold")) +
 
     # Plot margins
     theme(plot.margin = unit(c(1, 0.2, 2, 0), "cm")) # top, right, bottom, left
@@ -115,12 +119,12 @@ a <- ggplot(
   data = df,
   aes(x = generation, y = ranking, group = variables)) +
    theme_bump() +
-  geom_line(aes(color = variables, alpha = 1, linewidth = rev(ranking))) +
-    geom_point(size = 21, color = "white") +
-    geom_point(aes(color = variables), size = 20) +
-  scale_y_reverse(breaks = 1:nrow(df)) +
-  scale_x_discrete(limits = x_names_ordered,
-                  labels = labels,
+     geom_line(aes(color = variables, alpha = 1, linewidth = rev(ranking))) +
+     geom_point(size = 21, color = "white") +
+     geom_point(aes(color = variables), size = 20) +
+     scale_y_reverse(breaks = 1:nrow(df)) +
+    scale_x_discrete(limits = x_names_ordered,
+                  labels = x_names_full,
                   position = "top",
                   expand = expansion(mult = c(0.35, 0.1))) +
   labs(
