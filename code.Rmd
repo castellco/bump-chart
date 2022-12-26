@@ -65,21 +65,24 @@ x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Genera
 
 ```{r}
 x_names_full = c(
-  "**Silent**<br>1945 or earlier<br>**$44,683**",
-  "**Boomers**<br>1946 to 1964<br>**$62,203**",
-  "**Generation X**<br>1965 to 1980<br>**$83,357**",
-  "**Millennials**<br>1981 to 1996<br>**$69,061**",
-  "**Generation Z**<br>1997 or later<br>**$41,636**"
+  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**",
+
+  "<span style='font-size: 9.55pt'>**Boomers**</span><br>1946 to 1964<br>**$62,203**",
+
+  "<span style='font-size: 9.55pt'>**Generation X**</span><br>1965 to 1980<br>**$83,357**",
+
+  "<span style='font-size: 9.55pt'>**Millennials**</span><br>1981 to 1996<br>**$69,061**",
+
+  "<span style='font-size: 9.55pt'>**Generation Z**</span><br>1997 or later<br>**$41,636**"
 )
 ```
 
 ```{r}
-x_lab <- c("**Generation**<br>Birth Year Range<br>**Average Annual Expenditure**")
+x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Range<br>**Average Annual Expenditure**")
+
 ```
 
-```{#r}
-df$dollars  <- 
-```
+
 # Build custom theme
 
 ```{r}
@@ -105,20 +108,20 @@ theme_bump <- function() {
     theme(legend.position = "none") +
 
     # Format de caption
-    theme(plot.caption = element_text(hjust = 0.5, size = 6)) +
+    theme(plot.caption = element_text(hjust = 0.6, vjust= 0.1, size = 5.45)) +
 
     # Format title and axis labels
-    theme(plot.title = element_text(color = color_text, size = 18.5, face = "bold", hjust = 0.5)) +
-    theme(plot.subtitle = element_text(color = color_text, size = 11, hjust = 0.5, face = "bold")) +
+    theme(plot.title = element_text(color = color_text, size = 18.5, face = "bold", hjust = 0.5, margin=margin(0,0,10,0))) +
+    theme(plot.subtitle = element_text(color = color_text, size = 11, hjust = 0.5, face = "bold", margin=margin(0,0,22,0))) +
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
     theme(axis.text = element_markdown()) +
     theme(axis.text.x = element_markdown()) +
-    theme(axis.text.x.top = element_markdown(size = 8.3, color = "#3b3b3a")) +
+    theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
     theme(axis.text.y = element_blank()) +
     # theme(strip.text = element_text(face = "bold")) +
-    theme(plot.tag = element_markdown(size = 8, color = "black")) +
-    theme(plot.tag.position = c(0.10, 0.882)) +
+    theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
+    theme(plot.tag.position = c(0.10, 0.85)) +
 
     # Plot margins
     theme(plot.margin = unit(c(0.5, 0.4, 0.5, 0.4), "cm")) # top, right, bottom, left
@@ -136,16 +139,18 @@ a <- ggplot(
      geom_point(size = 11.85, color = "white") +
      geom_point(aes(color = variables), size = 11.3) +
      scale_y_reverse(breaks = 1:nrow(df)) +
-     scale_x_discrete(limits = x_names_ordered,
-                  labels = x_names_full,
-                  position = "top",
-                  expand = expansion(mult = c(0.356, 0.1))) +
+     scale_x_discrete(
+       limits = x_names_ordered,
+       labels = x_names_full,
+       position = "top",
+       expand = expansion(mult = c(0.356, 0.1))
+                    ) +
   labs(
     title = "HOW AMERICANS SPEND THEIR MONEY",
     subtitle = "By Age Group | 2021",
-    caption = "Original author: Preethi Lodha",
+    caption = "Author: Preethi Lodha",
     tag = x_lab
-  ) +
+      ) +
     geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.8), hjust = "outward", fontface = "bold", color = "#272727", size = 2.4) +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.25, fontface = "bold") +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.253, fontface = "bold") +
