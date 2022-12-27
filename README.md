@@ -4,10 +4,6 @@ This is a replica of the graph *How Americans spend their money*, originally cre
 
 [Source](https://www.visualcapitalist.com/cp/how-americans-spend-their-money-2022/).
 
-# TO DO
-- Add "$" to each geom_point.
-- Make geom_lines proportional to the money spent: thinner at the bottom, thicker at the top.
-- Add description of money spent and years range for each generation.
-- Add horizontal white lines.
-- Change fonts according to original source.
-- Make margins proportional
+# TODO reagarding enhancements
+- make all lines fit in a square 
+- make lines as thick as the money spent

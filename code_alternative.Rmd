@@ -10,13 +10,10 @@ library(ggtext)
 library(grid)
 ```
 
-PARALLEL 
-ver la evolución por generación, ya no por variable
-
 # Import data
 ```{r}
 df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data.csv")
-#View(df)
+View(df)
 ```
 
 # Pivot longer, add ranks and order chronologically
