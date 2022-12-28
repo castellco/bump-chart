@@ -177,12 +177,12 @@ geom_text(data = df %>% filter(generation == "Silent"),
   
   
 scale_color_manual(values = c(
+  "#ab3a6b",
   "#494c4d",
-  "#2f634a",
-  "#ed444a",
+  "#3896c4",
   "#8a8887", 
   "#af9e2e",
-  "#3896c4")) +
+  "#ed444a")) +
  coord_cartesian(clip = "off") +
       annotation_custom(
         linesGrob(
