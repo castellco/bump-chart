@@ -151,7 +151,7 @@ a <- ggplot(
     coord_cartesian(clip = "off") +
       annotation_custom(linesGrob(x = c(0, 0.99), y = c(1.11, 1.11), gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
       annotation_custom(linesGrob(x = c(0, 0.99), y = c(-0.05, -0.05), gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
-      geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72236), hjust = "outward", fontface = "bold", color = "#272727", size = 2.4) +
+        geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72236), hjust = "outward", fontface = "bold", color = "#272727", size = 2.4) +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.25, fontface = "bold") +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.253, fontface = "bold") +
       geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.257, fontface = "bold") +

@@ -9,7 +9,6 @@ library(ggplot2)
 library(ggtext)
 library(grid)
 library(ggrepel)
-#library(ggsankey)
 ```
 
 PARALLEL 
@@ -43,7 +42,7 @@ df$variables[df$variables == "food"] <- "Food"
 df$variables[df$variables == "entertainment"] <- "Entertainment"
 df$variables[df$variables == "healthcare"] <- "Healthcare"
 df$variables[df$variables == "housing"] <- "Housing"
-df$variables[df$variables == "insurance"] <- "Personal insurance and pensions"
+df$variables[df$variables == "insurance"] <- "Personal insurance \n and pensions"
 df$variables[df$variables == "miscellaneous"] <- "Miscellaneous expenditures"
 df$variables[df$variables == "personal_care"] <- "Personal care products and services"
 df$variables[df$variables == "reading"] <- "Reading"
@@ -88,16 +87,22 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
     # Format background colors
     theme(panel.background = element_rect(fill = color_background, color = color_background)) +
     theme(plot.background = element_rect(fill = color_background, color = color_background)) +
-    theme(panel.border = element_rect(color = color_background)) +
+    theme(panel.border = element_blank()) +
     theme(strip.background = element_rect(fill = color_background, color = color_background)) +
 
     # Format the grid
     theme(axis.ticks = element_blank()) +
-    theme(panel.grid = element_line(colour = color_background)) +
+    theme(panel.grid = element_blank()) +
 
     # Format the legend
-    theme(legend.position = "none") +
-
+    theme(legend.position = "bottom") +
+    theme(legend.background = element_blank()) +
+    theme(legend.key = element_rect(fill = color_background)) +
+    theme(legend.text	= element_markdown(color = color_text, size = 6.5, face = "bold")) +
+    theme(legend.title = element_blank()) +
+    theme(legend.direction = "horizontal") +
+    theme(legend.spacing.x = unit(.3, 'cm')) +
+      
     # Format de caption
     theme(plot.caption = element_text(hjust = 0.6, vjust= 0.1, size = 5.45)) +
 
@@ -109,7 +114,7 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
     theme(axis.text = element_markdown()) +
     theme(axis.text.x = element_markdown()) +
     theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
-    theme(axis.text.y = element_blank()) +
+    theme(axis.text.y = element_markdown()) +
     # theme(strip.text = element_text(face = "bold")) +
     theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
     theme(plot.tag.position = c(0.10, 0.85)) +
@@ -123,92 +128,79 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
 
 # Plot
 ```{r}
+set.seed(78)
 df <- subset(df, variables %in% c(head(unique(df$variables))))
 
 df %>% 
 ggplot() +
   aes(x = generation, 
-      y = dollars, 
+      y =dollars, 
       group = variables, 
       color= variables) +
-geom_line(alpha = 0.4, size = 1.7) +
+geom_line(alpha = 0.6, size = 1.4) +
 geom_point(size = 4, shape = 20, alpha = 0.6) +
 geom_point(size = 3, shape = 1, color="white", alpha = 0.7, stroke = 0.7) +
   scale_x_discrete(
      limits = x_names_ordered,
      labels = x_names_full,
      position = "top",
-     expand = expansion(mult = c(0.33, 0.1))
+     expand = expansion(mult = c(0.09, 0.1))
                   ) +
   scale_y_discrete(
-    expand = expansion(mult = c(0.023, 0.022))
+    expand = expansion(mult = c(0.001, 0.001))
                   ) +
 labs(
   title = "HOW AMERICANS SPEND THEIR MONEY",
-  subtitle = "By Age Group | 2021",
-  caption = "Author: Preethi Lodha",
-  tag = x_lab
+  subtitle = "Top 6 categories by age group | 2021",
+  caption = "Author: Preethi Lodha"
 ) +
-  
-geom_text(data = df %>% filter(generation == "Silent"),
-          aes(label = variables, x = 0.85),
-              color = color_text,
-              size = 2.4,
-              fontface = "bold",
-              hjust = "outward") +
 
-              # box.padding = 0.5) +
-
-  
+# DOLLARS SPENT LABS  
    geom_text_repel(
-    aes(label = dollars,
-      segment.square  = FALSE,
+    aes(label = paste0("$", (format(df$dollars, big.mark=",", trim=TRUE))),
+      segment.square  = TRUE,
       segment.inflect = TRUE
     ),
-    force             = 0.9,
-    nudge_x           = 0.15,
-    direction         = "y",
-    hjust             = 0,
-    segment.size      = 0.2,
-    segment.curvature = -0.1,
-    size = 2.7,
-    fontface = "bold"
-  ) +
-  
-  
+    max.overlaps  = 2,
+    size          = 2.5,
+    fontface      = "bold",
+    direction     = "y"
+    ) +
+guides(colour = guide_legend(nrow = 1)) +
 scale_color_manual(values = c(
   "#ab3a6b",
   "#494c4d",
   "#3896c4",
-  "#8a8887", 
+  "#2f634a", 
   "#af9e2e",
   "#ed444a")) +
  coord_cartesian(clip = "off") +
       annotation_custom(
         linesGrob(
           x = c(0, 0.99), 
-          y = c(1.11, 1.11), 
+          y = c(1.13, 1.13), 
           gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
       annotation_custom(
         linesGrob(
           x = c(0, 0.99), 
           y = c(-0.05, -0.05), 
           gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
-theme_lines() 
+theme_lines()
 ```
 
 
 ```{#r}
-# Add a comma in the appropriate place in each value of four or more digits in the dollar column
-df$dollars <- format(df$dollars, big.mark=",", trim=TRUE)
-
-# Paste the dollar sign at the beginning of each value in the "dollar" column
-df$dollars <- paste0("$", df$dollars)
-
+    direction     = "x",
+    vjust = 0.2,
+    hjust = 2,
+    segment.size  = 0.7,
+    size          = 2.5,
+    fontface      = "bold",
+    box.padding = unit(0.2,"lines"),
 ```
 
 ```{r}
-ggsave("bump-enhancements5.png", plot = last_plot(), path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 8.29, height = 6.88, units = "in", dpi = 120)
+ggsave("bump-enhancements.png", plot = last_plot(), path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 8.29, height = 6.88, units = "in", dpi = 120)
 ```
 
    # 
