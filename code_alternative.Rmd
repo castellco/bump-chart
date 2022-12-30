@@ -4,24 +4,34 @@ title: "Bump chart replica"
 
 # Import libraries
 ```{r}
+# remotes::install_github("hrbrmstr/ggchicklet")
+
 library(tidyverse)
 library(ggplot2)
 library(ggtext)
 library(grid)
+library(treemapify)
+library(patchwork)
+library(ggchicklet)
+library(usefunc)
+library(showtext)
 ```
 
 # Import data
 ```{r}
 df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data.csv")
-View(df)
+#View(df)
 ```
 
 # Pivot longer, add ranks and order chronologically
 ```{r}
 df <- df %>%
-  pivot_longer(-generation, names_to = "variables", values_to = "dollars") %>%
+  pivot_longer(-generation, 
+               names_to = "variables", 
+               values_to = "dollars") %>%
   group_by(generation) %>%
-  arrange(generation, desc(dollars)) %>%
+  arrange(generation, 
+          desc(dollars)) %>%
   mutate(ranking = row_number())
 
 df$generation[df$generation == "silent"] <- "Silent"
@@ -41,24 +51,31 @@ df$variables[df$variables == "healthcare"] <- "Healthcare"
 df$variables[df$variables == "housing"] <- "Housing"
 df$variables[df$variables == "insurance"] <- "Personal insurance and pensions"
 df$variables[df$variables == "miscellaneous"] <- "Miscellaneous expenditures"
-df$variables[df$variables == "personal_care"] <- "Personal care products and services"
+df$variables[df$variables == "personal_care"] <- "Personal care products \n and services"
 df$variables[df$variables == "reading"] <- "Reading"
 df$variables[df$variables == "smoking"] <- "Tobacco products and smoking \n supplies"
 df$variables[df$variables == "transportation"] <- "Transportation"
+
+
+# Categorize observations with a ranking <= 9 as "Others"
+df$variables[df$ranking >= 8] <- "Others"
+
+#Aggregation in order to have all "Others" in the same row
+
+df <- df %>%
+  group_by(generation, variables) %>%
+  summarise(dollars = sum(dollars))
+
+df$ranking <- NULL
+
 ```
 
 ```{r}
-# Add a comma in the appropriate place in each value of four or more digits in the dollar column
-df$dollars <- format(df$dollars, big.mark=",", trim=TRUE)
-
-# Paste the dollar sign at the beginning of each value in the "dollar" column
-df$dollars <- paste0("$", df$dollars)
-
-```
-
-
-```{r}
-x_names_ordered <- c("Silent", "Boomers", "Generation X", "Millennials", "Generation Z")
+x_names_ordered <- c("Silent", 
+                     "Boomers", 
+                     "Generation X", 
+                     "Millennials", 
+                     "Generation Z")
 ```
 
 ```{r}
@@ -81,21 +98,34 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
 
 
 # Build custom theme
+```{#r}
+# load fonts
+font_add_google(name = "Raleway", 
+                family = "raleway")
+showtext_auto()
+```
 
 ```{r}
-theme_bump <- function() {
-  # Colors
-  color_background <- "#e5d9cf"
-  color_text <- "#333333"
+# theme colours
+color_background <- "#e5d9cf"
+color_text <- "#333333"
+```
+
+
+```{r}
+theme_alt <- function() {
 
   # Begin construction of chart
   theme_bw(base_size = 15) +
 
     # Format background colors
-    theme(panel.background = element_rect(fill = color_background, color = color_background)) +
-    theme(plot.background = element_rect(fill = color_background, color = color_background)) +
+    theme(panel.background = element_rect(fill = color_background, 
+                                          color = color_background)) +
+    theme(plot.background = element_rect(fill = color_background, 
+                                         color = color_background)) +
     theme(panel.border = element_rect(color = color_background)) +
-    theme(strip.background = element_rect(fill = color_background, color = color_background)) +
+    theme(strip.background = element_rect(fill = color_background, 
+                                          color = color_background)) +
 
     # Format the grid
     theme(axis.ticks = element_blank()) +
@@ -105,75 +135,341 @@ theme_bump <- function() {
     theme(legend.position = "none") +
 
     # Format de caption
-    theme(plot.caption = element_text(hjust = 0.6, vjust= 0.1, size = 5.45)) +
+    theme(plot.caption = element_text(hjust = 0.6, 
+                                      vjust= 0.1, 
+                                      size = 5.45)) +
 
     # Format title and axis labels
-    theme(plot.title = element_text(color = color_text, size = 17.5, face = "bold", hjust = 0.5, margin=margin(0,0,10,0))) +
-    theme(plot.subtitle = element_text(color = color_text, size = 11, hjust = 0.5, face = "bold", margin=margin(0,0,22,0))) +
-    theme(axis.title.x = element_blank()) +
-    theme(axis.title.y = element_blank()) +
-    theme(axis.text = element_markdown()) +
-    theme(axis.text.x = element_markdown()) +
-    theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
+    theme(plot.title = element_text(color = color_text, 
+                                    size = 17.5, 
+                                    face = "bold", 
+                                    hjust = 0.5, 
+                                    margin=margin(0,0,10,0))) +
+    theme(plot.subtitle = element_text(color = color_text, 
+                                       size = 11, 
+                                       hjust = 0.5, 
+                                       face = "bold", 
+                                       margin=margin(0,0,22,0))) +
+    theme(axis.title.x = element_markdown()) +
+    theme(axis.title.y = element_markdown()) +
+    theme(axis.text = element_blank()) +
+    theme(axis.text.x = element_blank()) +
+    theme(axis.text.x.top = element_blank())+
     theme(axis.text.y = element_blank()) +
     # theme(strip.text = element_text(face = "bold")) +
-    theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
+    theme(plot.tag = element_markdown(family = 
+                                        "Arial Narrow", 
+                                      lineheight = 0.1, 
+                                      size = 8)) +
     theme(plot.tag.position = c(0.10, 0.85)) +
 
     # Plot margins
-    theme(plot.margin = unit(c(0.5, 0.4, 0.5, 0.65), "cm")) # top, right, bottom, left
+    theme(plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm")) # top, right, bottom, left
 }
 ```
 
-# Bump chart 
+```{r}
+# Add a comma in the appropriate place in each value of four or more digits in the dollar column
+df$dollars2 <- format(df$dollars, big.mark=",", trim=TRUE)
 
-```{r fig.width = 8.29, fig.height = 6.88}
-a <- ggplot(
-  data = df,
-  aes(x = generation, y = ranking, group = variables)) +
-   theme_bump() +
-     geom_line(aes(color = variables, alpha = 1, linewidth = rev(ranking))) +
-     geom_point(size = 11.85, color = "white") +
-     geom_point(aes(color = variables), size = 11.3) +
-     scale_y_reverse(breaks = 1:nrow(df)) +
-     scale_x_discrete(
-       limits = x_names_ordered,
-       labels = x_names_full,
-       position = "top",
-       expand = expansion(mult = c(0.356, 0.1))
-                    ) +
-  labs(
-    title = "HOW AMERICANS SPEND THEIR MONEY",
-    subtitle = "By Age Group | 2021",
-    caption = "Author: Preethi Lodha",
-    tag = x_lab
-  ) +
-    coord_cartesian(clip = "off") +
-      annotation_custom(grid::linesGrob(x = c(0, 0.99), y = c(1.11, 1.11), gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
-      annotation_custom(grid::linesGrob(x = c(0, 0.99), y = c(-0.05, -0.05), gp = gpar(col = "#f0eae8", lwd = 2.8, lineend = "square"))) +
-      geom_text(data = df %>% filter(generation == "Silent"), aes(label = variables, x = 0.72236), hjust = "outward", fontface = "bold", color = "#272727", size = 2.4) +
-      geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.25, fontface = "bold") +
-      geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.253, fontface = "bold") +
-      geom_text(data = df, aes(label = dollars), hjust = "center", color = "white", size = 2.257, fontface = "bold") +
-      scale_color_manual(values = c(
-        "#9c6255",
-        "#a0d4ee",
-        "#9d8379",
-        "#8f93b5",
-        "#494c4d",
-        "#2f634a",
-        "#ed444a",
-        "#8a8887",
-        "#a13b5d",
-        "#87a7a0",
-        "#af9e2e",
-        "#6d1f29",
-        "#466f9d",
-        "#3896c4"
-      )) 
-a
+# Paste the dollar sign at the beginning of each value in the "dollar" column
+df$dollars2 <- paste0("$",df$dollars2)
+
 ```
+
+
+# Individual treemaps
+
+## z
 
 ```{r}
-ggsave("bump-replica.png", plot = last_plot(), path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 8.29, height = 6.88, units = "in", dpi = 120)
+z <- ggplot(df %>% filter(generation=="Generation Z"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 7,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bw() +
+    #theme(aspect.ratio=1) +
+    scale_fill_manual(values=c("#c49350",
+                              "#c49350",
+                              "#c49350",
+                              "#c49350",
+                              "#805b28",
+                              "#e3b77b",
+                              "#c49350",
+                              "#c49350"))
+
+z
 ```
+
+## silent
+
+```{r}
+silent <- ggplot(df %>% filter(generation=="Silent"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 7,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bw() +
+    #theme(aspect.ratio=1) +
+    scale_fill_manual(values=c("#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#63431d",
+                              "#ba9a73",
+                              "#9a7447",
+                              "#9a7447"))
+
+silent
+```
+
+## boomers
+
+```{r}
+boomers <- ggplot(df %>% filter(generation=="Boomers"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 7,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bw() +
+    #theme(aspect.ratio=1) +
+    scale_fill_manual(values=c("#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#61563f",
+                              "#baac91",
+                              "#897d65",
+                              "#897d65"))
+
+boomers
+
+```
+
+## millennials
+
+```{r}
+millennials <- ggplot(df %>% filter(generation=="Millennials"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 7,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bw() +
+    #theme(aspect.ratio=1) +
+    scale_fill_manual(values=c("#6e6d6d",
+                              "#6e6d6d",
+                              "#6e6d6d",
+                              "#6e6d6d",
+                              "#4d4c4c",
+                              "#9e9e9e",
+                              "#6e6d6d",
+                              "#6e6d6d"))
+millennials
+```
+
+## x
+```{r}
+x <- ggplot(df %>% filter(generation=="Generation X"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 7,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bw() +
+    #theme(aspect.ratio=1) +
+    scale_fill_manual(values=c("#5e5d45",
+                              "#5e5d45",
+                              "#5e5d45",
+                              "#5e5d45",
+                              "#3b3a26",
+                              "#96957e",
+                              "#5e5d45",
+                              "#5e5d45"))
+x
+```
+
+
+# All 5 treemaps
+
+
+# Patchwork
+
+```{r}
+plt <-(x / millennials) | (boomers / silent) + z 
+plt
+
+```
+
+# Final graph
+```{r}
+
+```
+
+
+
+# Save plot
+
+```{r}
+ggsave("bump-alternative.png", 
+       plot = last_plot(), 
+       path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
+       width = 15, 
+       height = 7, 
+       units = "in", 
+       dpi = 300)
+```
+
+
+
+<!-- # Treemap -->
+
+<!-- ```{r} -->
+
+<!-- treemap <- df %>% ggplot( -->
+<!--             aes(area = dollars, -->
+<!--                 fill = variables, -->
+<!--                 subgroup = generation, -->
+<!--                 label = paste(variables, dollars2, sep = "\n"), -->
+<!--                 )) + -->
+<!--     geom_treemap( -->
+<!--                 layout = "srow", -->
+<!--                  radius = unit(0, "pt")) + -->
+<!--   geom_treemap_text( -->
+<!--                 layout = "srow", -->
+<!--                 colour = "#fbf2dd", -->
+<!--                 size = 9, -->
+<!--                 fontface = "bold", -->
+<!--                 family = "Consolas", -->
+<!--                 min.size = 3, -->
+<!--                 reflow = TRUE, -->
+<!--                 padding.x = unit(2, "mm"), -->
+<!--                 padding.y = unit(2, "mm")) + -->
+<!--   geom_treemap_subgroup_border( -->
+<!--     layout = "srow" -->
+<!--   )+ -->
+<!--   theme_alt() + -->
+<!--   theme(aspect.ratio=1) + -->
+<!--   scale_fill_manual(values=c("#c49350",  -->
+<!--                               "#c49350",  -->
+<!--                               "#c49350", -->
+<!--                               "#c49350", -->
+<!--                               "#c49350", -->
+<!--                               "#c49350", -->
+<!--                               "#805b28",  -->
+<!--                               "#e3b77b", -->
+<!--                               "#c49350", -->
+<!--                               "#c49350")) -->
+<!-- treemap -->
+<!-- ``` -->
+
+<!-- # Bar chart -->
+
+<!-- ```{r} -->
+<!-- # summarize the data so that it adds up all the spending for each of the generations -->
+<!-- df_summ <- df %>% -->
+<!--   group_by(generation) %>% -->
+<!--   summarise(total_per_generation = sum(dollars)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- # Set custom colors -->
+<!-- hist_colors <- c("#9c3c33", -->
+<!--                 "#75140b", -->
+<!--                 "#952419", -->
+<!--                 "#c43324", -->
+<!--                 "#752c26" -->
+<!--                 ) -->
+
+<!-- # Bar plot -->
+<!-- hist <- ggplot(data = df_summ, -->
+<!--   aes( -->
+<!--     x = generation, -->
+<!--     y = total_per_generation))+ -->
+<!--   scale_x_discrete( -->
+<!--        limits = x_names_ordered) + -->
+<!--   geom_col(fill = hist_colors) + -->
+<!--   geom_text(label = c("Silent", "Boomers", "Generation \n X", "Millennials", "Generation \n Z"), -->
+<!--             colour = "#fbf2dd", -->
+<!--             size = 2.5, -->
+<!--             fontface = "bold", -->
+<!--             family = "Consolas", -->
+<!--             vjust=2) + -->
+<!--   theme_alt() + -->
+<!--   theme(axis.text.x = element_blank())  -->
+
+<!-- hist -->
+
+<!-- ``` -->
+
+<!-- # Patchwork -->
+
+<!-- ```{r} -->
+<!-- plt <- hist / treemap -->
+<!-- plt -->
+<!-- ``` -->
+
