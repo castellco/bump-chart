@@ -98,12 +98,6 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
 
 
 # Build custom theme
-```{#r}
-# load fonts
-font_add_google(name = "Raleway", 
-                family = "raleway")
-showtext_auto()
-```
 
 ```{r}
 # theme colours
@@ -113,19 +107,20 @@ color_text <- "#333333"
 
 
 ```{r}
-theme_alt <- function() {
+
+theme_bump <- function() {
+  # Colors
+  color_background <- "#e5d9cf"
+  color_text <- "#333333"
 
   # Begin construction of chart
   theme_bw(base_size = 15) +
 
     # Format background colors
-    theme(panel.background = element_rect(fill = color_background, 
-                                          color = color_background)) +
-    theme(plot.background = element_rect(fill = color_background, 
-                                         color = color_background)) +
+    theme(panel.background = element_rect(fill = color_background, color = color_background)) +
+    theme(plot.background = element_rect(fill = color_background, color = color_background)) +
     theme(panel.border = element_rect(color = color_background)) +
-    theme(strip.background = element_rect(fill = color_background, 
-                                          color = color_background)) +
+    theme(strip.background = element_rect(fill = color_background, color = color_background)) +
 
     # Format the grid
     theme(axis.ticks = element_blank()) +
@@ -135,41 +130,29 @@ theme_alt <- function() {
     theme(legend.position = "none") +
 
     # Format de caption
-    theme(plot.caption = element_text(hjust = 0.6, 
-                                      vjust= 0.1, 
-                                      size = 5.45)) +
+    theme(plot.caption = element_text(hjust = 0.6, vjust= 0.1, size = 5.45)) +
 
     # Format title and axis labels
-    theme(plot.title = element_text(color = color_text, 
-                                    size = 17.5, 
-                                    face = "bold", 
-                                    hjust = 0.5, 
-                                    margin=margin(0,0,10,0))) +
-    theme(plot.subtitle = element_text(color = color_text, 
-                                       size = 11, 
-                                       hjust = 0.5, 
-                                       face = "bold", 
-                                       margin=margin(0,0,22,0))) +
-    theme(axis.title.x = element_markdown()) +
-    theme(axis.title.y = element_markdown()) +
-    theme(axis.text = element_blank()) +
-    theme(axis.text.x = element_blank()) +
-    theme(axis.text.x.top = element_blank())+
+    theme(plot.title = element_text(color = color_text, size = 17.5, face = "bold", hjust = 0.5, margin=margin(0,0,10,0))) +
+    theme(plot.subtitle = element_text(color = color_text, size = 11, hjust = 0.5, face = "bold", margin=margin(0,0,22,0))) +
+    theme(axis.title.x = element_blank()) +
+    theme(axis.title.y = element_blank()) +
+    theme(axis.text = element_markdown()) +
+    theme(axis.text.x = element_markdown()) +
+    theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
     theme(axis.text.y = element_blank()) +
     # theme(strip.text = element_text(face = "bold")) +
-    theme(plot.tag = element_markdown(family = 
-                                        "Arial Narrow", 
-                                      lineheight = 0.1, 
-                                      size = 8)) +
+    theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
     theme(plot.tag.position = c(0.10, 0.85)) +
 
     # Plot margins
-    theme(plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm")) # top, right, bottom, left
+    theme(plot.margin = unit(c(0.5, 0.4, 0.5, 0.65), "cm")) # top, right, bottom, left
 }
 ```
 
 ```{r}
 # Add a comma in the appropriate place in each value of four or more digits in the dollar column
+
 df$dollars2 <- format(df$dollars, big.mark=",", trim=TRUE)
 
 # Paste the dollar sign at the beginning of each value in the "dollar" column
@@ -201,8 +184,9 @@ z <- ggplot(df %>% filter(generation=="Generation Z"),
                 reflow = TRUE,
                 padding.x = unit(2, "mm"),
                 padding.y = unit(2, "mm")) +
-    theme_bw() +
+    theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
     scale_fill_manual(values=c("#c49350",
                               "#c49350",
                               "#c49350",
@@ -236,8 +220,9 @@ silent <- ggplot(df %>% filter(generation=="Silent"),
                 reflow = TRUE,
                 padding.x = unit(2, "mm"),
                 padding.y = unit(2, "mm")) +
-    theme_bw() +
+    theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
     scale_fill_manual(values=c("#9a7447",
                               "#9a7447",
                               "#9a7447",
@@ -271,8 +256,9 @@ boomers <- ggplot(df %>% filter(generation=="Boomers"),
                 reflow = TRUE,
                 padding.x = unit(2, "mm"),
                 padding.y = unit(2, "mm")) +
-    theme_bw() +
+    theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
     scale_fill_manual(values=c("#897d65",
                               "#897d65",
                               "#897d65",
@@ -307,8 +293,9 @@ millennials <- ggplot(df %>% filter(generation=="Millennials"),
                 reflow = TRUE,
                 padding.x = unit(2, "mm"),
                 padding.y = unit(2, "mm")) +
-    theme_bw() +
+    theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.), "cm")) + # top, right, bottom, left
     scale_fill_manual(values=c("#6e6d6d",
                               "#6e6d6d",
                               "#6e6d6d",
@@ -340,8 +327,9 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
                 reflow = TRUE,
                 padding.x = unit(2, "mm"),
                 padding.y = unit(2, "mm")) +
-    theme_bw() +
+    theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
     scale_fill_manual(values=c("#5e5d45",
                               "#5e5d45",
                               "#5e5d45",
@@ -353,16 +341,87 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
 x
 ```
 
+# Header
+```{r}
+header <- ggplot() +
+  annotate("text",
+           x = 0.1,
+           y = 0.1,
+           size = 2,
+           label = "This is my first line of text!\nAnother line of text.\n(Created by ggplot2)") + 
+theme(plot.margin = unit(c(0.01, 0.01, 0.01, 0.01), "cm")) # top, right, bottom, left
+header
+```
 
-# All 5 treemaps
+```{r}
+title <- data.frame(
+  x = 1, y = 1, 
+  label = paste(
+  "<span style='color: #3d2309; font-size: 30pt'>What do Americans spend the most money on?</span>",
+  "<span style='color: black; font-size: 10pt'></span>", 
+  sep = "<br>"))
+
+subtitle <- data.frame(
+  x = 1, 
+  y = 1, 
+  label = paste(
+  "<span style='color: #3d2309; font-size: 30pt'>What do Americans spend the most money on?</span>",
+  "<span style='color: black; font-size: 10pt'></span>", 
+  sep = "<br>"))
+
+head <- ggplot(text) +
+  geom_textbox(aes(x = x, 
+                   y = y, 
+                   label = label), 
+               family = "Consolas",
+               box.colour = "white",
+               alpha=1,
+               height = unit(7, "cm"),
+               width = unit(15, "cm")) +
+  theme_bump()
+
+head
+```
+
+```{#r}
+library(ggplot2)
+library(ggtext)
+
+df <- data.frame(
+  x = 1, 
+  y = 1, 
+  label = paste(
+          "<span style='color: red; font-size: 100pt'>1 in 6</span>",
+           "<span style='color: black; font-size: 20pt'>people admitted to cheating on their partner</span>", 
+          sep = "<br>"))
+
+ggplot(df) +
+  ggtext::geom_textbox(aes(x = x, y = y, label = label), box.colour = NA, width = unit(10, "cm")) +
+  theme_void()
+```
+
+
+# Footer
+```{#r}
+foot <- 
+```
 
 
 # Patchwork
 
 ```{r}
-plt <-(x / millennials) | (boomers / silent) + z 
+plt <- (x / millennials) | (boomers / silent) + z
 plt
+```
 
+```{r}
+plt <-  ((x / millennials) | (boomers / silent) + z) +  plot_layout(heights = c(1, 6)) +
+  plot_annotation(
+    title = "What do Americans spend the most money on?",
+    subtitle = "Este es el sutítulo",
+    caption = "Data: U.S. Bureau of Labor Statistics",
+    theme = theme_bump())
+plt
 ```
 
 # Final graph
@@ -371,15 +430,14 @@ plt
 ```
 
 
-
 # Save plot
 
 ```{r}
 ggsave("bump-alternative.png", 
        plot = last_plot(), 
        path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
-       width = 15, 
-       height = 7, 
+       width = 8.29, 
+       height = 6.88, 
        units = "in", 
        dpi = 300)
 ```
