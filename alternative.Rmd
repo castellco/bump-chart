@@ -13,8 +13,6 @@ library(grid)
 library(treemapify)
 library(patchwork)
 library(ggchicklet)
-library(usefunc)
-library(showtext)
 ```
 
 # Import data
@@ -101,7 +99,7 @@ x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Ra
 
 ```{r}
 # theme colours
-color_background <- "#e5d9cf"
+color_background <- "#ebdcc4"
 color_text <- "#333333"
 ```
 
@@ -341,47 +339,7 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
 x
 ```
 
-# Header
-```{r}
-header <- ggplot() +
-  annotate("text",
-           x = 0.1,
-           y = 0.1,
-           size = 2,
-           label = "This is my first line of text!\nAnother line of text.\n(Created by ggplot2)") + 
-theme(plot.margin = unit(c(0.01, 0.01, 0.01, 0.01), "cm")) # top, right, bottom, left
-header
-```
 
-```{r}
-title <- data.frame(
-  x = 1, y = 1, 
-  label = paste(
-  "<span style='color: #3d2309; font-size: 30pt'>What do Americans spend the most money on?</span>",
-  "<span style='color: black; font-size: 10pt'></span>", 
-  sep = "<br>"))
-
-subtitle <- data.frame(
-  x = 1, 
-  y = 1, 
-  label = paste(
-  "<span style='color: #3d2309; font-size: 30pt'>What do Americans spend the most money on?</span>",
-  "<span style='color: black; font-size: 10pt'></span>", 
-  sep = "<br>"))
-
-head <- ggplot(text) +
-  geom_textbox(aes(x = x, 
-                   y = y, 
-                   label = label), 
-               family = "Consolas",
-               box.colour = "white",
-               alpha=1,
-               height = unit(7, "cm"),
-               width = unit(15, "cm")) +
-  theme_bump()
-
-head
-```
 
 ```{#r}
 library(ggplot2)
@@ -400,19 +358,7 @@ ggplot(df) +
   theme_void()
 ```
 
-
-# Footer
-```{#r}
-foot <- 
-```
-
-
 # Patchwork
-
-```{r}
-plt <- (x / millennials) | (boomers / silent) + z
-plt
-```
 
 ```{r}
 plt <-  ((x / millennials) | (boomers / silent) + z) +  plot_layout(heights = c(1, 6)) +
@@ -424,16 +370,11 @@ plt <-  ((x / millennials) | (boomers / silent) + z) +  plot_layout(heights = c(
 plt
 ```
 
-# Final graph
-```{r}
-
-```
-
 
 # Save plot
 
 ```{r}
-ggsave("bump-alternative.png", 
+ggsave("alternative.png", 
        plot = last_plot(), 
        path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
        width = 8.29, 
@@ -441,49 +382,6 @@ ggsave("bump-alternative.png",
        units = "in", 
        dpi = 300)
 ```
-
-
-
-<!-- # Treemap -->
-
-<!-- ```{r} -->
-
-<!-- treemap <- df %>% ggplot( -->
-<!--             aes(area = dollars, -->
-<!--                 fill = variables, -->
-<!--                 subgroup = generation, -->
-<!--                 label = paste(variables, dollars2, sep = "\n"), -->
-<!--                 )) + -->
-<!--     geom_treemap( -->
-<!--                 layout = "srow", -->
-<!--                  radius = unit(0, "pt")) + -->
-<!--   geom_treemap_text( -->
-<!--                 layout = "srow", -->
-<!--                 colour = "#fbf2dd", -->
-<!--                 size = 9, -->
-<!--                 fontface = "bold", -->
-<!--                 family = "Consolas", -->
-<!--                 min.size = 3, -->
-<!--                 reflow = TRUE, -->
-<!--                 padding.x = unit(2, "mm"), -->
-<!--                 padding.y = unit(2, "mm")) + -->
-<!--   geom_treemap_subgroup_border( -->
-<!--     layout = "srow" -->
-<!--   )+ -->
-<!--   theme_alt() + -->
-<!--   theme(aspect.ratio=1) + -->
-<!--   scale_fill_manual(values=c("#c49350",  -->
-<!--                               "#c49350",  -->
-<!--                               "#c49350", -->
-<!--                               "#c49350", -->
-<!--                               "#c49350", -->
-<!--                               "#c49350", -->
-<!--                               "#805b28",  -->
-<!--                               "#e3b77b", -->
-<!--                               "#c49350", -->
-<!--                               "#c49350")) -->
-<!-- treemap -->
-<!-- ``` -->
 
 <!-- # Bar chart -->
 
@@ -522,12 +420,5 @@ ggsave("bump-alternative.png",
 
 <!-- hist -->
 
-<!-- ``` -->
-
-<!-- # Patchwork -->
-
-<!-- ```{r} -->
-<!-- plt <- hist / treemap -->
-<!-- plt -->
 <!-- ``` -->
 

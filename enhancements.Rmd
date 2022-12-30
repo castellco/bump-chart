@@ -200,7 +200,7 @@ theme_lines()
 ```
 
 ```{r}
-ggsave("bump-enhancements.png", plot = last_plot(), path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 8.29, height = 6.88, units = "in", dpi = 120)
+ggsave("enhancements.png", plot = last_plot(), path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", width = 8.29, height = 6.88, units = "in", dpi = 120)
 ```
 
    # 
