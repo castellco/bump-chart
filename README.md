@@ -4,6 +4,9 @@ This is a replica of the graph *How Americans spend their money*, originally cre
 
 [Source](https://www.visualcapitalist.com/cp/how-americans-spend-their-money-2022/).
 
-# TODO reagarding enhancements
-- make all lines fit in a square 
-- make lines as thick as the money spent
+# TODO reagarding the alternative visualization
+- Change fonts
+- Make tittle and subtitle bigger
+- Each treemap has to have a label. If not, make a legend.
+- Optional: Add a footer?
+- Optional: Add images?
