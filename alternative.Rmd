@@ -4,12 +4,15 @@ title: "Bump chart replica"
 
 # Import libraries
 ```{r}
+# remotes::install_github("hrbrmstr/ggchicklet")
+
 library(tidyverse)
 library(ggplot2)
 library(ggtext)
 library(grid)
 library(treemapify)
 library(patchwork)
+library(ggchicklet)
 library(cowplot)
 library(ggpubr)
 ```
@@ -138,7 +141,7 @@ theme_bump <- function() {
     theme(plot.caption = element_markdown(
       hjust = 1, 
       family = "Consolas",
-      size = 5.45)) +
+      size = 5.5)) +
 
     # Format title and axis labels
     theme(plot.title = element_markdown(
@@ -151,7 +154,7 @@ theme_bump <- function() {
     theme(plot.subtitle = element_markdown(
       color = color_text,
       family = "Consolas",
-      size = 11, 
+      size = 9, 
       hjust = 0.5, 
       face = "bold", 
       margin=margin(0,0,22,0))) +
@@ -213,14 +216,14 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
     #theme(aspect.ratio=1) +
     theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-      scale_fill_manual(values=c("#be7c4d",
-                              "#be7c4d",
-                              "#be7c4d",
-                              "#be7c4d",
-                              "#96592d",
-                              "#e39762",
-                              "#be7c4d",
-                              "#be7c4d"))
+        scale_fill_manual(values=c("#717342",
+                              "#717342",
+                              "#717342",
+                              "#717342",
+                              "#4b4d27",
+                              "#a4a671",
+                              "#717342",
+                              "#717342"))
 
 x
 ```
@@ -286,15 +289,15 @@ boomers <- ggplot(df %>% filter(generation=="Boomers"),
     theme_bump() +
     #theme(aspect.ratio=1) +
     theme(legend.position = "none") +
-    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-        scale_fill_manual(values=c("#9a7447",
-                              "#9a7447",
-                              "#9a7447",
-                              "#9a7447",
-                              "#63431d",
-                              "#ba9a73",
-                              "#9a7447",
-                              "#9a7447"))
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left        
+    scale_fill_manual(values=c("#be7c4d",
+                              "#be7c4d",
+                              "#be7c4d",
+                              "#be7c4d",
+                              "#96592d",
+                              "#e39762",
+                              "#be7c4d",
+                              "#be7c4d"))
                               
 boomers
 
@@ -325,15 +328,15 @@ silent <- ggplot(df %>% filter(generation=="Silent"),
     #theme(aspect.ratio=1) +
     theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-      scale_fill_manual(values=c("#897d65",
-                              "#897d65",
-                              "#897d65",
-                              "#897d65",
-                              "#61563f",
-                              "#baac91",
-                              "#897d65",
-                              "#897d65"))
-
+    scale_fill_manual(values=c("#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#63431d",
+                              "#ba9a73",
+                              "#9a7447",
+                              "#9a7447"))
+                              
 
 silent
 ```
@@ -363,15 +366,14 @@ z <- ggplot(df %>% filter(generation=="Generation Z"),
     #theme(aspect.ratio=1) +
     theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-      scale_fill_manual(values=c("#717342",
-                              "#717342",
-                              "#717342",
-                              "#717342",
-                              "#4b4d27",
-                              "#a4a671",
-                              "#717342",
-                              "#717342"))
-
+      scale_fill_manual(values=c("#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#61563f",
+                              "#baac91",
+                              "#897d65",
+                              "#897d65"))
 
 z
 ```
@@ -383,6 +385,7 @@ z
 df_summ <- df %>%
     group_by(generation) %>%
     summarise(total_per_generation = sum(dollars))
+
 ```
 
 ```{r}
@@ -393,25 +396,12 @@ gen_order <- c("Silent",
        "Generation Z")
 gen_order
 
-gen_full = c(
-  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**",
-
-  "<span style='font-size: 9.55pt'>**Boomers**</span><br>1946 to 1964<br>**$62,203**",
-
-  "<span style='font-size: 9.55pt'>**Generation X**</span><br>1965 to 1980<br>**$83,357**",
-
-  "<span style='font-size: 9.55pt'>**Millennials**</span><br>1981 to 1996<br>**$69,061**",
-
-  "<span style='font-size: 9.55pt'>**Generation Z**</span><br>1997 or later<br>**$41,636**"
-)
-gen_full
-  
 ```
 
 
 ```{r}
 # Set custom colors
-hist_colors <- c("#9a7447",
+bar_colors <- c("#9a7447",
                           "#be7c4d",
                           "#717342",
                           "#c49350",
@@ -425,19 +415,29 @@ bar <- ggplot(df_summ) +
     weight = total_per_generation) +
   geom_bar() +
   scale_fill_manual(breaks=gen_order, 
-                    values = hist_colors) +
+                    values = bar_colors,
+                    name = "",
+                    labels = c("**Silent**<br>1945 or earlier<br>**$44,683**", 
+                               "**Boomers**<br>1946 to 1964<br>$**62,203**", 
+                               "**Generation X**<br>1965 to 1980<br>**$83,357**", 
+                               "**Millennials**<br>1981 to 1996<br>**$69,061**", 
+                               "**Generation Z**<br>1997 or later<br>**$41,636**")) +
   scale_x_discrete(
     limits = gen_order) +
   theme_minimal() +
   theme(plot.margin = unit(c(0,0,0,0), "pt")) +
-  theme(legend.text = element_markdown(color = color_text,
+  theme(legend.text = element_markdown(
+      color = color_text,
+      family = "Consolas",
+      size = 7, 
+      hjust = 0.5)) + # top, right, bottom, left
+  theme(legend.title = element_markdown(color = color_text,
       family = "Consolas",
       size = 10, 
       face = "bold", 
-      hjust = 0.5)) + # top, right, bottom, left
-  theme(legend.title = element_blank()) +
+      hjust = 0.5)) +
   theme(legend.position = "bottom") +
-  theme(legend.spacing.x = unit(0.5, 'cm')) 
+  theme(legend.spacing.x = unit(0.5, 'cm'))
 
 bar
 ```
@@ -458,15 +458,15 @@ legend <- as_ggplot(legend_extract)
 # Patchwork
 
 ```{r}
-plt <- legend + ((x / millennials) | (boomers / silent) + z) + 
+plt <- legend + ((silent / boomers) | (x / millennials) + z) + 
   plot_layout(
               nrow = 2,
               ncol = 1,
-              heights = c(0.3, 6)) +
+              heights = c(0.5, 6)) +
   plot_annotation(
     title = "<span style='color: #3d2309; font-size: 15pt'>_Housing_: more than 30% of Americans' expenditures in 2021</span>",
     
-    subtitle = "<span style='color: #4e4b4b; font-size: 10pt'>It was the top spending category across all generations in 2021. <br>_Gen X_ spent the most, followed by _Millennials_ and _Boomers_.</span>",
+    subtitle = "<span style='color: #4e4b4b; font-size: 10pt'>It was the top spending category across all generations in 2021. <br>_Gen X_ spent the most ($83,357), followed by _Millennials_ ($69,091) and _Boomers_ ($62,203).</span>",
     
     caption = "Carolina Cornejo Castellano | Data: U.S. Bureau of Labor Statistics",
     theme = theme_bump())
