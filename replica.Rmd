@@ -117,7 +117,10 @@ theme_bump <- function() {
     theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
     theme(axis.text.y = element_blank()) +
     # theme(strip.text = element_text(face = "bold")) +
-    theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
+    theme(plot.tag = element_markdown(
+      family = "Arial Narrow", 
+      lineheight = 0.1, 
+      size = 8)) +
     theme(plot.tag.position = c(0.10, 0.85)) +
 
     # Plot margins

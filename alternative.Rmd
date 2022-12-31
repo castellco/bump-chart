@@ -13,6 +13,7 @@ library(grid)
 library(treemapify)
 library(patchwork)
 library(ggchicklet)
+library(cowplot)
 ```
 
 # Import data
@@ -115,36 +116,65 @@ theme_bump <- function() {
   theme_bw(base_size = 15) +
 
     # Format background colors
-    theme(panel.background = element_rect(fill = color_background, color = color_background)) +
-    theme(plot.background = element_rect(fill = color_background, color = color_background)) +
-    theme(panel.border = element_rect(color = color_background)) +
-    theme(strip.background = element_rect(fill = color_background, color = color_background)) +
+    theme(panel.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
+    theme(plot.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
+    theme(panel.border = element_rect(
+      color = color_background)) +
+    theme(strip.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
 
     # Format the grid
     theme(axis.ticks = element_blank()) +
-    theme(panel.grid = element_line(colour = color_background)) +
+    theme(panel.grid = element_line(
+      colour = color_background)) +
 
     # Format the legend
-    theme(legend.position = "none") +
+    #theme(legend.position = "none") +
 
     # Format de caption
-    theme(plot.caption = element_text(hjust = 0.6, vjust= 0.1, size = 5.45)) +
+    theme(plot.caption = element_markdown(
+      hjust = 1, 
+      family = "Consolas",
+      size = 5.45)) +
 
     # Format title and axis labels
-    theme(plot.title = element_text(color = color_text, size = 17.5, face = "bold", hjust = 0.5, margin=margin(0,0,10,0))) +
-    theme(plot.subtitle = element_text(color = color_text, size = 11, hjust = 0.5, face = "bold", margin=margin(0,0,22,0))) +
+    theme(plot.title = element_markdown(
+      color = color_text,
+      family = "Consolas",
+      size = 17.5, 
+      face = "bold", 
+      hjust = 0.5, 
+      margin=margin(0,0,10,0))) +
+    theme(plot.subtitle = element_markdown(
+      color = color_text,
+      family = "Consolas",
+      size = 11, 
+      hjust = 0.5, 
+      face = "bold", 
+      margin=margin(0,0,22,0))) +
     theme(axis.title.x = element_blank()) +
     theme(axis.title.y = element_blank()) +
     theme(axis.text = element_markdown()) +
     theme(axis.text.x = element_markdown()) +
-    theme(axis.text.x.top = element_markdown(color = "#3b3b3a", family = "Arial Narrow", size=7.5)) +
+    theme(axis.text.x.top = element_markdown(
+      color = "#3b3b3a", 
+      family = "Consolas", 
+      size=7.5)) +
     theme(axis.text.y = element_blank()) +
     # theme(strip.text = element_text(face = "bold")) +
-    theme(plot.tag = element_markdown(family = "Arial Narrow", lineheight = 0.1, size = 8)) +
+    theme(plot.tag = element_markdown(
+      family = "Consolas",
+      lineheight = 0.1, 
+      size = 8)) +
     theme(plot.tag.position = c(0.10, 0.85)) +
 
     # Plot margins
-    theme(plot.margin = unit(c(0.5, 0.4, 0.5, 0.65), "cm")) # top, right, bottom, left
+    theme(plot.margin = unit(c(0.5, 0.5, 0.2, 0.5), "cm")) # top, right, bottom, left
 }
 ```
 
@@ -161,10 +191,9 @@ df$dollars2 <- paste0("$",df$dollars2)
 
 # Individual treemaps
 
-## z
-
+## x
 ```{r}
-z <- ggplot(df %>% filter(generation=="Generation Z"),
+x <- ggplot(df %>% filter(generation=="Generation X"),
             aes(area = dollars,
                 fill = variables,
                 label = paste(variables, dollars2, sep = "\n")
@@ -175,7 +204,7 @@ z <- ggplot(df %>% filter(generation=="Generation Z"),
     geom_treemap_text(
                 layout = "srow",
                 colour = "#fbf2dd",
-                size = 7,
+                size = 9,
                 fontface = "bold",
                 family = "Consolas",
                 min.size = 3,
@@ -184,90 +213,18 @@ z <- ggplot(df %>% filter(generation=="Generation Z"),
                 padding.y = unit(2, "mm")) +
     theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-    scale_fill_manual(values=c("#c49350",
-                              "#c49350",
-                              "#c49350",
-                              "#c49350",
-                              "#805b28",
-                              "#e3b77b",
-                              "#c49350",
-                              "#c49350"))
+      scale_fill_manual(values=c("#be7c4d",
+                              "#be7c4d",
+                              "#be7c4d",
+                              "#be7c4d",
+                              "#96592d",
+                              "#e39762",
+                              "#be7c4d",
+                              "#be7c4d"))
 
-z
-```
-
-## silent
-
-```{r}
-silent <- ggplot(df %>% filter(generation=="Silent"),
-            aes(area = dollars,
-                fill = variables,
-                label = paste(variables, dollars2, sep = "\n")
-                )) +
-    geom_treemap(
-                layout = "srow",
-                 radius = unit(0, "pt")) +
-    geom_treemap_text(
-                layout = "srow",
-                colour = "#fbf2dd",
-                size = 7,
-                fontface = "bold",
-                family = "Consolas",
-                min.size = 3,
-                reflow = TRUE,
-                padding.x = unit(2, "mm"),
-                padding.y = unit(2, "mm")) +
-    theme_bump() +
-    #theme(aspect.ratio=1) +
-    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-    scale_fill_manual(values=c("#9a7447",
-                              "#9a7447",
-                              "#9a7447",
-                              "#9a7447",
-                              "#63431d",
-                              "#ba9a73",
-                              "#9a7447",
-                              "#9a7447"))
-
-silent
-```
-
-## boomers
-
-```{r}
-boomers <- ggplot(df %>% filter(generation=="Boomers"),
-            aes(area = dollars,
-                fill = variables,
-                label = paste(variables, dollars2, sep = "\n")
-                )) +
-    geom_treemap(
-                layout = "srow",
-                 radius = unit(0, "pt")) +
-    geom_treemap_text(
-                layout = "srow",
-                colour = "#fbf2dd",
-                size = 7,
-                fontface = "bold",
-                family = "Consolas",
-                min.size = 3,
-                reflow = TRUE,
-                padding.x = unit(2, "mm"),
-                padding.y = unit(2, "mm")) +
-    theme_bump() +
-    #theme(aspect.ratio=1) +
-    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-    scale_fill_manual(values=c("#897d65",
-                              "#897d65",
-                              "#897d65",
-                              "#897d65",
-                              "#61563f",
-                              "#baac91",
-                              "#897d65",
-                              "#897d65"))
-
-boomers
-
+x
 ```
 
 ## millennials
@@ -284,7 +241,7 @@ millennials <- ggplot(df %>% filter(generation=="Millennials"),
     geom_treemap_text(
                 layout = "srow",
                 colour = "#fbf2dd",
-                size = 7,
+                size = 9,
                 fontface = "bold",
                 family = "Consolas",
                 min.size = 3,
@@ -293,21 +250,24 @@ millennials <- ggplot(df %>% filter(generation=="Millennials"),
                 padding.y = unit(2, "mm")) +
     theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.), "cm")) + # top, right, bottom, left
-    scale_fill_manual(values=c("#6e6d6d",
-                              "#6e6d6d",
-                              "#6e6d6d",
-                              "#6e6d6d",
-                              "#4d4c4c",
-                              "#9e9e9e",
-                              "#6e6d6d",
-                              "#6e6d6d"))
+        scale_fill_manual(values=c("#c49350",
+                              "#c49350",
+                              "#c49350",
+                              "#c49350",
+                              "#805b28",
+                              "#e3af6b",
+                              "#c49350",
+                              "#c49350"))
+                              
 millennials
 ```
 
-## x
+## boomers
+
 ```{r}
-x <- ggplot(df %>% filter(generation=="Generation X"),
+boomers <- ggplot(df %>% filter(generation=="Boomers"),
             aes(area = dollars,
                 fill = variables,
                 label = paste(variables, dollars2, sep = "\n")
@@ -318,7 +278,7 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
     geom_treemap_text(
                 layout = "srow",
                 colour = "#fbf2dd",
-                size = 7,
+                size = 9,
                 fontface = "bold",
                 family = "Consolas",
                 min.size = 3,
@@ -327,49 +287,213 @@ x <- ggplot(df %>% filter(generation=="Generation X"),
                 padding.y = unit(2, "mm")) +
     theme_bump() +
     #theme(aspect.ratio=1) +
+    theme(legend.position = "none") +
     theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
-    scale_fill_manual(values=c("#5e5d45",
-                              "#5e5d45",
-                              "#5e5d45",
-                              "#5e5d45",
-                              "#3b3a26",
-                              "#96957e",
-                              "#5e5d45",
-                              "#5e5d45"))
-x
+        scale_fill_manual(values=c("#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#9a7447",
+                              "#63431d",
+                              "#ba9a73",
+                              "#9a7447",
+                              "#9a7447"))
+                              
+boomers
+
 ```
 
+## silent
+
+```{r}
+silent <- ggplot(df %>% filter(generation=="Silent"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 9,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bump() +
+    #theme(aspect.ratio=1) +
+    theme(legend.position = "none") +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
+      scale_fill_manual(values=c("#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#897d65",
+                              "#61563f",
+                              "#baac91",
+                              "#897d65",
+                              "#897d65"))
+
+
+silent
+```
+
+## z
+
+```{r}
+z <- ggplot(df %>% filter(generation=="Generation Z"),
+            aes(area = dollars,
+                fill = variables,
+                label = paste(variables, dollars2, sep = "\n")
+                )) +
+    geom_treemap(
+                layout = "srow",
+                 radius = unit(0, "pt")) +
+    geom_treemap_text(
+                layout = "srow",
+                colour = "#fbf2dd",
+                size = 9,
+                fontface = "bold",
+                family = "Consolas",
+                min.size = 3,
+                reflow = TRUE,
+                padding.x = unit(2, "mm"),
+                padding.y = unit(2, "mm")) +
+    theme_bump() +
+    #theme(aspect.ratio=1) +
+    theme(legend.position = "none") +
+    theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")) + # top, right, bottom, left
+      scale_fill_manual(values=c("#717342",
+                              "#717342",
+                              "#717342",
+                              "#717342",
+                              "#4b4d27",
+                              "#a4a671",
+                              "#717342",
+                              "#717342"))
+
+
+z
+```
+
+# Bar chart (house roof)
+
+```{r}
+# summarize the data so that it adds up all the spending for each of the generations
+df_summ <- df %>%
+    group_by(generation) %>%
+    summarise(total_per_generation = sum(dollars))
+```
+
+
+```{r}
+# Set custom colors
+hist_colors <- c("#9a7447",
+                          "#be7c4d",
+                          "#717342",
+                          "#c49350",
+                          "#897d65"
+                )
+
+# Bar plot
+hist <- ggplot(data = df_summ,
+               aes(
+                   x = generation,
+                   y = total_per_generation,
+                   fill = generation))+
+    scale_x_discrete(
+        limits = c("Silent", 
+                   "Boomers", 
+                   "Generation X", 
+                   "Millennials", 
+                   "Generation Z")) +
+    geom_col(fill = hist_colors)     # theme(axis.text.x = element_blank()) +
+    #   # Format the legend
+    # theme(legend.position = "bottom")
+    # theme(legend.background = element_blank()) +
+    # theme(legend.key = element_rect(fill = color_background)) +
+    # theme(legend.text	= element_markdown(color = color_text, size = 6.5, face = "bold")) +
+    # theme(legend.title = element_blank()) +
+    # theme(legend.direction = "horizontal") +
+    # theme(legend.spacing.x = unit(.3, 'cm')) +
+    # theme(plot.margin = unit(c(0.01, 0.5, 0.01, 0.5), "cm")) # top, right, bottom, left
+
+hist
+
+```
+
+```{r}
+# este funcionó mejor
+bar <- ggplot(df_summ) +
+  aes(
+    x = generation,
+    fill = generation,
+    weight = total_per_generation
+  ) +
+  geom_bar() +
+  scale_fill_manual(values = hist_colors) +
+  theme_minimal()
+```
 
 
 ```{#r}
 library(ggplot2)
 library(ggtext)
 
-df <- data.frame(
+df_box <- data.frame(
   x = 1, 
   y = 1, 
   label = paste(
-          "<span style='color: red; font-size: 100pt'>1 in 6</span>",
-           "<span style='color: black; font-size: 20pt'>people admitted to cheating on their partner</span>", 
-          sep = "<br>"))
+  "<span style='font-size: 9.55pt'>█ **Silent**</span><br>1945 or earlier<br>**$44,683**",
 
-ggplot(df) +
+  "<span style='font-size: 9.55pt'>█ **Boomers**</span><br>1946 to 1964<br>**$62,203**",
+
+  "<span style='font-size: 9.55pt'>█ **Generation X**</span><br>1965 to 1980<br>**$83,357**",
+
+  "<span style='font-size: 9.55pt'>█ **Millennials**</span><br>1981 to 1996<br>**$69,061**",
+
+  "<span style='font-size: 9.55pt'>█ **Generation Z**</span><br>1997 or later<br>**$41,636**"))
+
+ggplot(df_box) +
   ggtext::geom_textbox(aes(x = x, y = y, label = label), box.colour = NA, width = unit(10, "cm")) +
-  theme_void()
+  theme_bump()
+```
+
+```{#r}
+tags <- c(
+  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**"
+)
 ```
 
 # Patchwork
 
 ```{r}
-plt <-  ((x / millennials) | (boomers / silent) + z) +  plot_layout(heights = c(1, 6)) +
+plt <- ((x / millennials) | (boomers / silent) + z) + 
+  plot_layout(
+              nrow = 1,
+              ncol = 2,
+              heights = c(1, 6)) +
   plot_annotation(
-    title = "What do Americans spend the most money on?",
-    subtitle = "Este es el sutítulo",
-    caption = "Data: U.S. Bureau of Labor Statistics",
+    title = "<span style='color: #3d2309; font-size: 15pt'>_Housing_: more than 30% of Americans' expenditures in 2021</span>",
+    
+    subtitle = "<span style='color: #4e4b4b; font-size: 10pt'>It was the top spending category across all generations in 2021. <br>_Gen X_ spent the most, followed by _Millennials_ and _Boomers_.</span>",
+    
+    caption = "Carolina Cornejo Castellano | Data: U.S. Bureau of Labor Statistics",
     theme = theme_bump())
+  
+  
+  
+  # annotate(geom = "text", x = 1, y = 2, label = "TEXTO  IMPORTANTE", hjust = "center")
+
+  
+  # 
+  # labs(
+  #   tag = tags) & theme(plot.tag.position = c(0.10, 0.85))
+
 plt
 ```
-
 
 # Save plot
 
@@ -383,42 +507,4 @@ ggsave("alternative.png",
        dpi = 300)
 ```
 
-<!-- # Bar chart -->
-
-<!-- ```{r} -->
-<!-- # summarize the data so that it adds up all the spending for each of the generations -->
-<!-- df_summ <- df %>% -->
-<!--   group_by(generation) %>% -->
-<!--   summarise(total_per_generation = sum(dollars)) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- # Set custom colors -->
-<!-- hist_colors <- c("#9c3c33", -->
-<!--                 "#75140b", -->
-<!--                 "#952419", -->
-<!--                 "#c43324", -->
-<!--                 "#752c26" -->
-<!--                 ) -->
-
-<!-- # Bar plot -->
-<!-- hist <- ggplot(data = df_summ, -->
-<!--   aes( -->
-<!--     x = generation, -->
-<!--     y = total_per_generation))+ -->
-<!--   scale_x_discrete( -->
-<!--        limits = x_names_ordered) + -->
-<!--   geom_col(fill = hist_colors) + -->
-<!--   geom_text(label = c("Silent", "Boomers", "Generation \n X", "Millennials", "Generation \n Z"), -->
-<!--             colour = "#fbf2dd", -->
-<!--             size = 2.5, -->
-<!--             fontface = "bold", -->
-<!--             family = "Consolas", -->
-<!--             vjust=2) + -->
-<!--   theme_alt() + -->
-<!--   theme(axis.text.x = element_blank())  -->
-
-<!-- hist -->
-
-<!-- ``` -->
 

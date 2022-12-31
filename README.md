@@ -4,7 +4,7 @@ This is a replica of the graph *How Americans spend their money*, originally cre
 
 [Source](https://www.visualcapitalist.com/cp/how-americans-spend-their-money-2022/).
 
-# TODO reagarding the alternative visualization
+# TODO regarding the alternative visualization
 - Change fonts
 - Make tittle and subtitle bigger
 - Each treemap has to have a label. If not, make a legend.
