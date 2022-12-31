@@ -22,7 +22,7 @@ df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main
 #View(df)
 ```
 
-# Pivot longer, add ranks and order chronologically
+# Data wrangling
 ```{r}
 df <- df %>%
   pivot_longer(-generation, 
@@ -378,7 +378,7 @@ z <- ggplot(df %>% filter(generation=="Generation Z"),
 z
 ```
 
-# Bar chart (house roof)
+# Bar chart
 
 ```{r}
 # summarize the data so that it adds up all the spending for each of the generations
@@ -387,94 +387,80 @@ df_summ <- df %>%
     summarise(total_per_generation = sum(dollars))
 ```
 
-
 ```{r}
-# Set custom colors
-hist_colors <- c("#9a7447",
-                          "#be7c4d",
-                          "#717342",
-                          "#c49350",
-                          "#897d65"
-                )
+gen_order <- c("Silent", 
+       "Boomers", 
+       "Generation X", 
+       "Millennials", 
+       "Generation Z")
+gen_order
 
-# Bar plot
-hist <- ggplot(data = df_summ,
-               aes(
-                   x = generation,
-                   y = total_per_generation,
-                   fill = generation))+
-    scale_x_discrete(
-        limits = c("Silent", 
-                   "Boomers", 
-                   "Generation X", 
-                   "Millennials", 
-                   "Generation Z")) +
-    geom_col(fill = hist_colors)     # theme(axis.text.x = element_blank()) +
-    #   # Format the legend
-    # theme(legend.position = "bottom")
-    # theme(legend.background = element_blank()) +
-    # theme(legend.key = element_rect(fill = color_background)) +
-    # theme(legend.text	= element_markdown(color = color_text, size = 6.5, face = "bold")) +
-    # theme(legend.title = element_blank()) +
-    # theme(legend.direction = "horizontal") +
-    # theme(legend.spacing.x = unit(.3, 'cm')) +
-    # theme(plot.margin = unit(c(0.01, 0.5, 0.01, 0.5), "cm")) # top, right, bottom, left
+gen_full = c(
+  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**",
 
-hist
+  "<span style='font-size: 9.55pt'>**Boomers**</span><br>1946 to 1964<br>**$62,203**",
 
+  "<span style='font-size: 9.55pt'>**Generation X**</span><br>1965 to 1980<br>**$83,357**",
+
+  "<span style='font-size: 9.55pt'>**Millennials**</span><br>1981 to 1996<br>**$69,061**",
+
+  "<span style='font-size: 9.55pt'>**Generation Z**</span><br>1997 or later<br>**$41,636**"
+)
+gen_full
+  
 ```
 
+
 ```{r}
-# este funcionó mejor
 bar <- ggplot(df_summ) +
   aes(
     x = generation,
     fill = generation,
-    weight = total_per_generation
-  ) +
+    weight = total_per_generation) +
   geom_bar() +
-  scale_fill_manual(values = hist_colors) +
-  theme_minimal()
+  scale_fill_manual(breaks=gen_order, 
+                    values = hist_colors) +
+  scale_x_discrete(
+    limits = gen_order) +
+  theme_minimal() +
+  theme(plot.margin = unit(c(0,0,0,0), "pt")) +
+  theme(legend.text = element_markdown(color = color_text,
+      family = "Consolas",
+      size = 10, 
+      face = "bold", 
+      hjust = 0.5)) + # top, right, bottom, left
+  theme(legend.title = element_blank()) +
+  theme(legend.position = "bottom") +
+  theme(legend.spacing.x = unit(0.5, 'cm'))  +
+  ## important additional element
+  guides(fill = guide_legend(byrow = FALSE))
+
+bar
 ```
 
-
-```{#r}
-library(ggplot2)
-library(ggtext)
-
-df_box <- data.frame(
-  x = 1, 
-  y = 1, 
-  label = paste(
-  "<span style='font-size: 9.55pt'>█ **Silent**</span><br>1945 or earlier<br>**$44,683**",
-
-  "<span style='font-size: 9.55pt'>█ **Boomers**</span><br>1946 to 1964<br>**$62,203**",
-
-  "<span style='font-size: 9.55pt'>█ **Generation X**</span><br>1965 to 1980<br>**$83,357**",
-
-  "<span style='font-size: 9.55pt'>█ **Millennials**</span><br>1981 to 1996<br>**$69,061**",
-
-  "<span style='font-size: 9.55pt'>█ **Generation Z**</span><br>1997 or later<br>**$41,636**"))
-
-ggplot(df_box) +
-  ggtext::geom_textbox(aes(x = x, y = y, label = label), box.colour = NA, width = unit(10, "cm")) +
-  theme_bump()
+```{r}
+# extract the legend from one of the plots
+# (clearly the whole thing only makes sense if all plots
+# have the same legend, so we can arbitrarily pick one.)
+legend_extract <- get_legend(bar) 
+                             
+legend_extract 
 ```
 
-```{#r}
-tags <- c(
-  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**"
-)
+```{r}
+legend <- plot_grid(legend_extract, ncol = 1, rel_heights = c(0.5, 0.1))
+legend
 ```
+
 
 # Patchwork
 
 ```{r}
-plt <- ((x / millennials) | (boomers / silent) + z) + 
+plt <- legend + ((x / millennials) | (boomers / silent) + z) + 
   plot_layout(
-              nrow = 1,
-              ncol = 2,
-              heights = c(1, 6)) +
+              nrow = 2,
+              ncol = 1,
+              heights = c(0.3, 6)) +
   plot_annotation(
     title = "<span style='color: #3d2309; font-size: 15pt'>_Housing_: more than 30% of Americans' expenditures in 2021</span>",
     
@@ -482,15 +468,6 @@ plt <- ((x / millennials) | (boomers / silent) + z) +
     
     caption = "Carolina Cornejo Castellano | Data: U.S. Bureau of Labor Statistics",
     theme = theme_bump())
-  
-  
-  
-  # annotate(geom = "text", x = 1, y = 2, label = "TEXTO  IMPORTANTE", hjust = "center")
-
-  
-  # 
-  # labs(
-  #   tag = tags) & theme(plot.tag.position = c(0.10, 0.85))
 
 plt
 ```
