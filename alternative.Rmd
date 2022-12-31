@@ -4,16 +4,14 @@ title: "Bump chart replica"
 
 # Import libraries
 ```{r}
-# remotes::install_github("hrbrmstr/ggchicklet")
-
 library(tidyverse)
 library(ggplot2)
 library(ggtext)
 library(grid)
 library(treemapify)
 library(patchwork)
-library(ggchicklet)
 library(cowplot)
+library(ggpubr)
 ```
 
 # Import data
@@ -412,6 +410,14 @@ gen_full
 
 
 ```{r}
+# Set custom colors
+hist_colors <- c("#9a7447",
+                          "#be7c4d",
+                          "#717342",
+                          "#c49350",
+                          "#897d65"
+)
+
 bar <- ggplot(df_summ) +
   aes(
     x = generation,
@@ -431,25 +437,21 @@ bar <- ggplot(df_summ) +
       hjust = 0.5)) + # top, right, bottom, left
   theme(legend.title = element_blank()) +
   theme(legend.position = "bottom") +
-  theme(legend.spacing.x = unit(0.5, 'cm'))  +
-  ## important additional element
-  guides(fill = guide_legend(byrow = FALSE))
+  theme(legend.spacing.x = unit(0.5, 'cm')) 
 
 bar
 ```
 
 ```{r}
-# extract the legend from one of the plots
-# (clearly the whole thing only makes sense if all plots
-# have the same legend, so we can arbitrarily pick one.)
+# extract the legend
 legend_extract <- get_legend(bar) 
                              
 legend_extract 
 ```
 
+
 ```{r}
-legend <- plot_grid(legend_extract, ncol = 1, rel_heights = c(0.5, 0.1))
-legend
+legend <- as_ggplot(legend_extract)
 ```
 
 
