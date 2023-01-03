@@ -431,10 +431,10 @@ bar <- ggplot(df_summ) +
       family = "Consolas",
       size = 7, 
       hjust = 0.5)) + # top, right, bottom, left
-  theme(legend.title = element_markdown(color = color_text,
+  theme(legend.title = element_markdown(
+      color = color_text,
       family = "Consolas",
-      size = 10, 
-      face = "bold", 
+      size = 7, 
       hjust = 0.5)) +
   theme(legend.position = "bottom") +
   theme(legend.spacing.x = unit(0.5, 'cm'))
@@ -477,7 +477,7 @@ plt
 # Save plot
 
 ```{r}
-ggsave("alternative.png", 
+ggsave("alternative_tree.png", 
        plot = last_plot(), 
        path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
        width = 8.29, 

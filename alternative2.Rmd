@@ -1,0 +1,349 @@
+---
+title: "Bump chart replica"
+---
+
+# Import libraries
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(ggtext)
+library(grid)
+library(ggrepel)
+library(ggpubr)
+```
+
+# Import data
+```{r}
+df <- read_csv("https://github.com/carolinacornejocastellano/bump-chart/raw/main/data.csv")
+#View(df)
+```
+
+# Data wrangling
+```{r}
+df <- df %>%
+  pivot_longer(-generation, 
+               names_to = "variables", 
+               values_to = "dollars") %>%
+  group_by(generation) %>%
+  arrange(generation, 
+          desc(dollars)) %>%
+  mutate(ranking = row_number())
+
+df$generation[df$generation == "silent"] <- "Silent"
+df$generation[df$generation == "boomers"] <- "Boomers"
+df$generation[df$generation == "gen_X"] <- "Generation X"
+df$generation[df$generation == "millennials"] <- "Millennials"
+df$generation[df$generation == "gen_Z"] <- "Generation Z"
+
+df$variables[df$variables == "alcohol"] <- "Alcoholic beverages"
+df$variables[df$variables == "apparel"] <- "Apparel and<br>services"
+df$variables[df$variables == "cash_contributions"] <- "Cash contributions"
+df$variables[df$variables == "education"] <- "Education"
+df$variables[df$variables == "entertainment"] <- "Entertainment"
+df$variables[df$variables == "food"] <- "Food"
+df$variables[df$variables == "entertainment"] <- "Entertainment"
+df$variables[df$variables == "healthcare"] <- "Healthcare"
+df$variables[df$variables == "housing"] <- "Housing"
+df$variables[df$variables == "insurance"] <- "Personal insurance<br>and pensions"
+df$variables[df$variables == "miscellaneous"] <- "Miscellaneous expenditures"
+df$variables[df$variables == "personal_care"] <- "Personal care products<br>and services"
+df$variables[df$variables == "reading"] <- "Reading"
+df$variables[df$variables == "smoking"] <- "Tobacco products and smoking \n supplies"
+df$variables[df$variables == "transportation"] <- "Transportation"
+
+
+# Categorize observations with a ranking <= 9 as "Others"
+df$variables[df$ranking >= 8] <- "Others"
+
+#Aggregation in order to have all "Others" in the same row
+
+df <- df %>%
+  group_by(generation, variables) %>%
+  summarise(dollars = sum(dollars))
+
+df$ranking <- NULL
+
+```
+
+```{r}
+x_names_ordered <- c("Silent", 
+                     "Boomers", 
+                     "Generation X", 
+                     "Millennials", 
+                     "Generation Z")
+```
+
+```{r}
+x_names_full = c(
+  "<span style='font-size: 9.55pt'>**Silent**</span><br>1945 or earlier<br>**$44,683**",
+
+  "<span style='font-size: 9.55pt'>**Boomers**</span><br>1946 to 1964<br>**$62,203**",
+
+  "<span style='font-size: 9.55pt'>**Generation X**</span><br>1965 to 1980<br>**$83,357**",
+
+  "<span style='font-size: 9.55pt'>**Millennials**</span><br>1981 to 1996<br>**$69,061**",
+
+  "<span style='font-size: 9.55pt'>**Generation Z**</span><br>1997 or later<br>**$41,636**"
+)
+```
+
+```{r}
+x_lab <- c("<span style='font-size: 10pt'>**Generation**</span><br>Birth Year Range<br>**Average Annual Expenditure**")
+```
+
+
+# Build custom theme
+
+```{r}
+# theme colours
+color_background <- "#e5d9cf"
+color_text <- "#333333"
+```
+
+
+```{r}
+
+theme_bar <- function() {
+
+  # Begin construction of chart
+  theme_bw(base_size = 15) +
+
+    # Format background colors
+    theme(panel.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
+    theme(plot.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
+    theme(panel.border = element_rect(
+      color = color_background)) +
+    theme(strip.background = element_rect(
+      fill = color_background, 
+      color = color_background)) +
+
+    # Format the grid
+    theme(axis.ticks = element_blank()) +
+    theme(panel.grid = element_blank()) +
+
+    # Format the legend
+    theme(legend.position = "top") +
+    theme(
+       legend.text = element_markdown(
+        color = color_text,
+        family = "Consolas",
+        size = 7.5,
+        face = "bold",
+        hjust = 0)) + # top, right, bottom, left
+    theme(legend.title = element_blank()) +
+    theme(legend.spacing.x = unit(0.5, 'cm')) +
+    theme(legend.background = element_blank()) +
+    theme(legend.key = element_blank()) +
+    #theme(legend.margin = )
+    
+    # Format de caption
+      theme(plot.caption = element_markdown(
+        hjust = 1, 
+        family = "Consolas",
+        size = 5.5)) +
+
+    # Format title and axis labels
+    theme(plot.title = element_markdown(
+      color = color_text,
+      family = "Consolas",
+      size = 17.5, 
+      face = "bold", 
+      hjust = 0.5,
+      margin=margin(4,0.2,4,0.2))) +
+    theme(plot.title.position = "plot") +
+    theme(plot.subtitle = element_markdown(
+      color = color_text,
+      family = "Consolas",
+      size = 9, 
+      hjust = 0.5, 
+      face = "bold", 
+      margin=margin(4,0.2,4,0.2))) +
+    theme(axis.title.x = element_blank()) +
+    theme(axis.title.y = element_blank()) +
+    theme(axis.text = element_markdown()) +
+    theme(axis.text.x = element_blank()) +
+    theme(axis.text.y = element_markdown(
+      color = "#3b3b3a", 
+      family = "Consolas", 
+      size=7.5
+    )) +
+    theme(axis.text.x = element_markdown(
+      color = "#3b3b3a", 
+      family = "Consolas", 
+      size=7.5
+    )) +
+    # theme(strip.text = element_text(face = "bold")) +
+    theme(plot.tag = element_markdown(
+      family = "Consolas",
+      lineheight = 0.1, 
+      size = 8)) +
+    theme(plot.tag.position = c(0.10, 0.85)) +
+
+    # Plot margins
+      theme(plot.margin = unit(c(0.2, 1, 0.2, 0.2), "cm")) # top, right, bottom, left
+}
+```
+
+```{r}
+# Add a comma in the appropriate place in each value of four or more digits in the dollar column
+
+df$dollars2 <- format(df$dollars, big.mark=",", trim=TRUE)
+
+# Paste the dollar sign at the beginning of each value in the "dollar" column
+df$dollars2 <- paste0("$",df$dollars2)
+
+```
+
+```{r}
+gen_order <- c("Silent",
+       "Boomers",
+       "Generation X",
+       "Millennials",
+       "Generation Z")
+gen_order
+```
+
+```{r}
+#Colorblind friendly palette
+colorblind <- c(
+                "#5d3686",
+                "#c3a939",
+                "#6c7ed7",
+                "#b95336",
+                "#74a344",
+                "#a19f9f",
+                "#ba496b",
+                "#43c9b0",
+                "#c26abb",
+                "#ae853d"
+                )
+```
+
+# Bar chart
+```{r}
+bar <- ggplot(df, aes(
+                      fill = reorder(variables, desc(dollars)), 
+                      y    = dollars,
+                      x    = generation)) +
+    geom_bar(position  = "dodge", 
+             stat      = "identity",
+             linewidth = 0.05,
+             color     = color_background) +
+ geom_text(aes(label = dollars2),
+            position      = position_dodge(0.9),
+            color         = color_text,
+            family        = "Consolas",
+            vjust         = 0.5,
+            hjust         = -0.3,
+            size          = 2.5
+            ) +
+  scale_x_discrete(
+    limits = gen_order,
+    labels = c("**Silent**<br>1945 or earlier<br>**$44,683**",
+               "**Boomers**<br>1946 to 1964<br>$**62,203**",
+               "**Generation X**<br>1965 to 1980<br>**$83,357**",
+               "**Millennials**<br>1981 to 1996<br>**$69,061**",
+               "**Generation Z**<br>1997 or later<br>**$41,636**")
+               ) +
+  scale_y_continuous(
+        expand = c(0.01,0),
+                    ) +
+  scale_fill_manual(
+    values = colorblind #colorblind-friendly palette
+                    ) +
+  labs(
+    title = "<span style='color: #3d2309; font-size: 15pt'>_Housing_: more than 30% of Americans' expenditures in 2021</span>",
+    
+    subtitle = "<span style='color: #4e4b4b; font-size: 10pt'>It was the top spending category across all generations in 2021. <br>_Gen X_ spent the most ($83,357), followed by _Millennials_ ($69,091) and _Boomers_ ($62,203).</span>",
+    
+    caption = "Carolina Cornejo Castellano | Data: U.S. Bureau of Labor Statistics"
+       ) +
+  theme_bar() +
+  theme(
+    legend.box.margin = margin(0.2,2,0.2,0.2, unit = "cm"),
+    plot.title.position = "plot",
+    axis.text.x = element_blank()) +
+  
+  coord_flip()
+  
+bar
+```
+
+# Save plot
+
+```{r}
+ggsave("alternative_bar.png", 
+       plot = last_plot(), 
+       path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
+       width = 8.29, 
+       height = 6.88,   
+       units = "in", 
+       dpi = 300)
+```
+
+# Lollipop plot
+```{r}
+lol <-
+ggplot(df)+
+    geom_linerange(aes(
+      x = generation,
+      ymin = 0, 
+      ymax = dollars, 
+      colour = reorder(variables, desc(dollars))), 
+      position = position_dodge(0.8))+
+    geom_point(
+      aes(
+        x = generation,
+        y = dollars,
+        colour = reorder(variables, desc(dollars)),
+      ),
+      size = 4,
+      position = position_dodge(0.8)
+    ) +
+    scale_x_discrete(
+    limits = gen_order,
+    labels = c("**Silent**<br>1945 or earlier<br>**$44,683**",
+               "**Boomers**<br>1946 to 1964<br>$**62,203**",
+               "**Generation X**<br>1965 to 1980<br>**$83,357**",
+               "**Millennials**<br>1981 to 1996<br>**$69,061**",
+               "**Generation Z**<br>1997 or later<br>**$41,636**")
+               ) +
+  scale_y_continuous(
+        expand = c(0.03,0),
+        n.breaks = 8
+        ) +
+  scale_color_manual(values = colorblind) +
+  labs(
+    title = "<span style='color: #3d2309; font-size: 15pt'>_Housing_: more than 30% of Americans' expenditures in 2021</span>",
+    
+    subtitle = "<span style='color: #4e4b4b; font-size: 10pt'>It was the top spending category across all generations in 2021. <br>_Gen X_ spent the most ($83,357), followed by _Millennials_ ($69,091) and _Boomers_ ($62,203).</span>",
+    
+    caption = "Carolina Cornejo Castellano | Data: U.S. Bureau of Labor Statistics"
+       ) +
+  theme_bar() +
+    theme(
+          legend.box.margin = margin(0.2,1,0.2,0.2, unit = "cm"),
+          plot.title.position = "plot",
+          panel.grid.major.y = element_line(color = "#b0aeae",
+                                          size = 0.25,
+                                          linetype = "dashed"))
+lol
+```
+
+# Save plot
+
+```{r}
+ggsave("alternative_lol.png", 
+       plot = last_plot(), 
+       path = "C:/Users/Carolina/0_ccast/master/04_dataviz/bump-chart/bump-chart", 
+       width = 8.29, 
+       height = 6.88,   
+       units = "in", 
+       dpi = 300)
+```
+
+
